@@ -1,21 +1,19 @@
 package commander
 
 import (
-	"fmt"
 	"log"
-
+	
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/pkg/errors"
-	"gitlab.ozon.dev/kshmatov/masterclass1/config"
+	"gitlab.ozon.dev/Hostile359/homework-1/config"
+	"gitlab.ozon.dev/Hostile359/homework-1/internal/commandhandler"
 )
 
 type CmdHandler func(string) string
 
-var UnknownCommand = errors.New("unknown command")
-
 type Commander struct {
 	bot   *tgbotapi.BotAPI
-	route map[string]CmdHandler
+	commandHandler *commandhandler.CommandHandler
 }
 
 func Init() (*Commander, error) {
@@ -27,14 +25,13 @@ func Init() (*Commander, error) {
 	bot.Debug = true
 	log.Printf("Authorized on account %s", bot.Self.UserName)
 
+	commandHandler := &commandhandler.CommandHandler{}
+	commandHandler.Init()
+
 	return &Commander{
 		bot:   bot,
-		route: make(map[string]CmdHandler),
+		commandHandler: commandHandler,
 	}, nil
-}
-
-func (c *Commander) RegisterHandler(cmd string, f CmdHandler) {
-	c.route[cmd] = f
 }
 
 func (c *Commander) Run() error {
@@ -47,16 +44,11 @@ func (c *Commander) Run() error {
 			continue
 		}
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
-		if cmd := update.Message.Command(); cmd != "" {
-			if f, ok := c.route[cmd]; ok {
-				msg.Text = f(update.Message.CommandArguments())
-			} else {
-				msg.Text = "Unknown command"
-			}
-		} else {
-			log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-			msg.Text = fmt.Sprintf("you send <%v>", update.Message.Text)
-		}
+		cmd := update.Message.Command()
+		args := update.Message.CommandArguments()
+		msg.Text = c.commandHandler.HandleCommand(cmd, args)
+		
+		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 		_, err := c.bot.Send(msg)
 		if err != nil {
 			return errors.Wrap(err, "send tg message")

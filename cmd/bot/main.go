@@ -3,8 +3,7 @@ package main
 import (
 	"log"
 
-	"gitlab.ozon.dev/kshmatov/masterclass1/internal/commander"
-	"gitlab.ozon.dev/kshmatov/masterclass1/internal/handlers"
+	"gitlab.ozon.dev/Hostile359/homework-1/internal/commander"
 )
 
 func main() {
@@ -13,7 +12,6 @@ func main() {
 	if err != nil {
 		log.Panic(err)
 	}
-	handlers.AddHandlers(cmd)
 
 	if err := cmd.Run(); err != nil {
 		log.Panic(err)
