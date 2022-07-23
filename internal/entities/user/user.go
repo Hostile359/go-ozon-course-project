@@ -1,21 +1,24 @@
-package userstore
+package user
 
 import (
 	"fmt"
 )
 
+type UserId uint
+
 type User struct {
-	id       uint
+	id       UserId
 	name     string
 	password string
 }
 
-func NewUser(id uint, name, password string) *User {
-	u := &User{
+func NewUser(id UserId, name, password string) User {
+	u := User{
 		id: id,
 		name: name,
 		password: password,
 	}
+
 	return u
 }
 
@@ -39,6 +42,6 @@ func (u User) GetPassword() string {
 	return u.password
 }
 
-func (u User) GetId() uint {
+func (u User) GetId() UserId {
 	return u.id
 }

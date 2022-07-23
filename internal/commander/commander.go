@@ -16,22 +16,19 @@ type Commander struct {
 	commandHandler *commandhandler.CommandHandler
 }
 
-func Init() (*Commander, error) {
+func MustNew(commandHandler *commandhandler.CommandHandler) Commander {
 	bot, err := tgbotapi.NewBotAPI(config.ApiKey)
 	if err != nil {
-		return nil, errors.Wrap(err, "init tgbot")
+		log.Panic(errors.Wrap(err, "init tgbot"))
 	}
 
 	bot.Debug = true
 	log.Printf("Authorized on account %s", bot.Self.UserName)
 
-	commandHandler := &commandhandler.CommandHandler{}
-	commandHandler.Init()
-
-	return &Commander{
+	return Commander{
 		bot:   bot,
 		commandHandler: commandHandler,
-	}, nil
+	}
 }
 
 func (c *Commander) Run() error {

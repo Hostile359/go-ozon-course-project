@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"gitlab.ozon.dev/Hostile359/homework-1/internal/memoryuserstore"
-	"gitlab.ozon.dev/Hostile359/homework-1/internal/userstore"
+	"gitlab.ozon.dev/Hostile359/homework-1/internal/app/userapp"
+	"gitlab.ozon.dev/Hostile359/homework-1/internal/entities/user"
 )
 
 const (
@@ -16,80 +16,78 @@ const (
 	addCmd  = "add"
 	updateCmd = "update"
 	getCmd = "get"
-	getallCmd = "getall"
+	listCmd = "list"
 	deleteCmd = "delete"
 )
 
+type CommandFunc func(*CommandHandler, string) string
+
 type CommandHandler struct {
-	userStore userstore.UserStore
+	route map[string]CommandFunc
+	userApp userapp.App
+	lastId user.UserId
 }
 
-func (commandHandler *CommandHandler) Init() {
-	commandHandler.userStore = &memoryuserstore.MemoryUserStore{}
-	commandHandler.userStore.Init()
+func New(userApp userapp.App) *CommandHandler {
+	route := make(map[string]CommandFunc)
+	route[startCmd] = startFunc
+	route[helpCmd] = helpFunc
+	route[addCmd] = addFunc
+	route[updateCmd] = updateFunc
+	route[getCmd] = getFunc
+	route[listCmd] = listFunc
+	route[deleteCmd] = deleteFunc
+
+	return &CommandHandler{
+		userApp: userApp,
+		route: route,
+		lastId: 1,
+	}
 }
 
-func (commandHandler *CommandHandler) HandleCommand(cmd, args string) string {
-	var res string
-	switch cmd {
-	case startCmd:
-		res = commandHandler.startFunc(args)
-	case helpCmd:
-		res = commandHandler.helpFunc(args)
-	case addCmd:
-		res = commandHandler.addFunc(args)
-	case updateCmd:
-		res = commandHandler.updateFunc(args)
-	case getCmd:
-		res = commandHandler.getFunc(args)
-	case getallCmd:
-		res = commandHandler.getallFunc(args)
-	case deleteCmd:
-		res = commandHandler.deleteFunc(args)
-	default:
-		res = "Unknown command, use /help to get info about available commands"
+func (c *CommandHandler) HandleCommand(cmd, args string) string {
+	cmdFunc, ok := c.route[cmd];
+	if !ok {
+		return "Unknown command, use /help to get info about available commands"
 	}
 
-	return res
+	return cmdFunc(c, args)
 }
 
-func (CommandHandler) startFunc(s string) string {
+func startFunc(_ *CommandHandler, s string) string {
 	return "Bot started, use /help to get more info"
 }
 
-func (CommandHandler) helpFunc(s string) string {
+func helpFunc(_ *CommandHandler, s string) string {
 	return "/help - list commands\n" +
 		"/add <name> <password> - add new user with name and password\n" +
 		"/update <used_id> <new_name> <new_password> - update user's name and password\n" +
 		"/get <used_id> - get user info\n" +
-		"/getall - get users list\n" +
+		"/list - get users list\n" +
 		"/delete <used_id> - delete user"
 }
 
-func (commandHandler *CommandHandler) addFunc(data string) string {
+func addFunc(c *CommandHandler, data string) string {
 	args := strings.Split(data, " ")
 	if len(args) != 2 {
 		return fmt.Sprintf("bad arguments <%v>", args)
 	}
-
 	name, password := args[0], args[1]
+	u := user.NewUser(c.lastId, name, password)
 
-	if err := checkName(name); err != nil {
-		return err.Error()
+	if err := c.userApp.Add(u); err != nil {
+		if errors.Is(err, userapp.ErrValidationArgs) || errors.Is(err, userapp.ErrUserExists) {
+			return err.Error()
+		}
+		return "internal error"
 	}
 
-	if err := checkPassword(password); err != nil {
-		return err.Error()
-	}
+	c.lastId += 1
 
-	err := commandHandler.userStore.AddUser(name, password)
-	if err != nil {
-		return err.Error()
-	}
 	return "user added"
 }
 
-func (commandHandler *CommandHandler) updateFunc(data string) string {
+func updateFunc(c *CommandHandler, data string) string {
 	args := strings.Split(data, " ")
 	if len(args) != 3 {
 		return fmt.Sprintf("bad arguments <%v>", args)
@@ -101,23 +99,19 @@ func (commandHandler *CommandHandler) updateFunc(data string) string {
 	}
 
 	name, password := args[1], args[2]
+	u := user.NewUser(userId, name, password)
 
-	if err := checkName(name); err != nil {
-		return err.Error()
+	if err := c.userApp.Update(u); err != nil {
+		if errors.Is(err, userapp.ErrValidationArgs) || errors.Is(err, userapp.ErrUserNotExists) {
+			return err.Error()
+		}
+		return "internal error"
 	}
 
-	if err := checkPassword(password); err != nil {
-		return err.Error()
-	}
-
-	err = commandHandler.userStore.UpdateUser(userId, name, password)
-	if err != nil {
-		return err.Error()
-	}
 	return "user updated"
 }
 
-func (commandHandler CommandHandler) getFunc(data string) string {
+func getFunc(c *CommandHandler, data string) string {
 	args := strings.Split(data, " ")
 	if len(args) != 1 {
 		return fmt.Sprintf("bad arguments <%v>", args)
@@ -128,15 +122,18 @@ func (commandHandler CommandHandler) getFunc(data string) string {
 		return err.Error()
 	}
 
-	u, err := commandHandler.userStore.GetUser(userId)
+	u, err := c.userApp.Get(userId)
 	if err != nil {
-		return err.Error()
+		if errors.Is(err, userapp.ErrUserNotExists) {
+			return err.Error()
+		}
+		return "internal error"
 	}
 	return fmt.Sprintf("%v", u.String())
 }
 
-func (commandHandler CommandHandler) getallFunc(s string) string {
-	usersList := commandHandler.userStore.GetAllUsers()
+func listFunc(c *CommandHandler, data string) string {
+	usersList := c.userApp.List()
 	res := make([]string, 0, len(usersList)+1)
 	res = append(res, "Users list:")
 	for _, u := range usersList {
@@ -145,7 +142,7 @@ func (commandHandler CommandHandler) getallFunc(s string) string {
 	return strings.Join(res, "\n")
 }
 
-func (commandHandler *CommandHandler)deleteFunc(data string) string {
+func deleteFunc(c *CommandHandler, data string) string {
 	args := strings.Split(data, " ")
 	if len(args) != 1 {
 		return fmt.Sprintf("bad arguments <%v>", args)
@@ -156,31 +153,19 @@ func (commandHandler *CommandHandler)deleteFunc(data string) string {
 		return err.Error()
 	}
 
-	err = commandHandler.userStore.DeleteUser(userId)
-	if err != nil {
-		return err.Error()
+	if err := c.userApp.Delete(userId); err != nil {
+		if errors.Is(err, userapp.ErrUserNotExists) {
+			return err.Error()
+		}
+		return "internal error"
 	}
 	return "user deleted"
 }
 
-func checkId(id string) (uint, error) {
+func checkId(id string) (user.UserId, error) {
 	parsedId, err := strconv.ParseUint(id, 10, 0)
 	if err != nil {
-		return 0, errors.Errorf("bad id <%v>, id must be number", id)
+		return 0, errors.Wrapf(userapp.ErrValidationArgs, "<%v>, id must be number", id)
 	}
-	return uint(parsedId), nil
-}
-
-func checkName(name string) error {
-	if len(name) == 0 || len(name) > 10 {
-		return errors.Errorf("bad name <%v>, len should be from 1 to 10", name)
-	}
-	return nil
-}
-
-func checkPassword(password string) error {
-	if len(password) < 6 || len(password) > 10 {
-		return errors.Errorf("bad password <%v>, len should be from 6 to 10", password)
-	}	
-	return nil
+	return user.UserId(parsedId), nil
 }
