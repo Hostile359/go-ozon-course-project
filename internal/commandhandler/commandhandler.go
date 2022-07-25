@@ -20,7 +20,7 @@ const (
 	deleteCmd = "delete"
 )
 
-type CommandFunc func(*CommandHandler, string) string
+type CommandFunc func(string) string
 
 type CommandHandler struct {
 	route map[string]CommandFunc
@@ -30,19 +30,21 @@ type CommandHandler struct {
 
 func New(userApp userapp.App) *CommandHandler {
 	route := make(map[string]CommandFunc)
-	route[startCmd] = startFunc
-	route[helpCmd] = helpFunc
-	route[addCmd] = addFunc
-	route[updateCmd] = updateFunc
-	route[getCmd] = getFunc
-	route[listCmd] = listFunc
-	route[deleteCmd] = deleteFunc
-
-	return &CommandHandler{
+	cH := CommandHandler{
 		userApp: userApp,
 		route: route,
 		lastId: 1,
 	}
+
+	route[startCmd] = cH.startFunc
+	route[helpCmd] = cH.helpFunc
+	route[addCmd] = cH.addFunc
+	route[updateCmd] = cH.updateFunc
+	route[getCmd] = cH.getFunc
+	route[listCmd] = cH.listFunc
+	route[deleteCmd] = cH.deleteFunc
+
+	return &cH
 }
 
 func (c *CommandHandler) HandleCommand(cmd, args string) string {
@@ -51,14 +53,14 @@ func (c *CommandHandler) HandleCommand(cmd, args string) string {
 		return "Unknown command, use /help to get info about available commands"
 	}
 
-	return cmdFunc(c, args)
+	return cmdFunc(args)
 }
 
-func startFunc(_ *CommandHandler, s string) string {
+func (*CommandHandler) startFunc(s string) string {
 	return "Bot started, use /help to get more info"
 }
 
-func helpFunc(_ *CommandHandler, s string) string {
+func (*CommandHandler) helpFunc(s string) string {
 	return "/help - list commands\n" +
 		"/add <name> <password> - add new user with name and password\n" +
 		"/update <used_id> <new_name> <new_password> - update user's name and password\n" +
@@ -67,7 +69,7 @@ func helpFunc(_ *CommandHandler, s string) string {
 		"/delete <used_id> - delete user"
 }
 
-func addFunc(c *CommandHandler, data string) string {
+func (c *CommandHandler) addFunc(data string) string {
 	args := strings.Split(data, " ")
 	if len(args) != 2 {
 		return fmt.Sprintf("bad arguments <%v>", args)
@@ -87,7 +89,7 @@ func addFunc(c *CommandHandler, data string) string {
 	return "user added"
 }
 
-func updateFunc(c *CommandHandler, data string) string {
+func (c *CommandHandler) updateFunc(data string) string {
 	args := strings.Split(data, " ")
 	if len(args) != 3 {
 		return fmt.Sprintf("bad arguments <%v>", args)
@@ -111,7 +113,7 @@ func updateFunc(c *CommandHandler, data string) string {
 	return "user updated"
 }
 
-func getFunc(c *CommandHandler, data string) string {
+func (c *CommandHandler) getFunc(data string) string {
 	args := strings.Split(data, " ")
 	if len(args) != 1 {
 		return fmt.Sprintf("bad arguments <%v>", args)
@@ -132,7 +134,7 @@ func getFunc(c *CommandHandler, data string) string {
 	return fmt.Sprintf("%v", u.String())
 }
 
-func listFunc(c *CommandHandler, data string) string {
+func (c *CommandHandler) listFunc(data string) string {
 	usersList := c.userApp.List()
 	res := make([]string, 0, len(usersList)+1)
 	res = append(res, "Users list:")
@@ -142,7 +144,7 @@ func listFunc(c *CommandHandler, data string) string {
 	return strings.Join(res, "\n")
 }
 
-func deleteFunc(c *CommandHandler, data string) string {
+func (c *CommandHandler) deleteFunc(data string) string {
 	args := strings.Split(data, " ")
 	if len(args) != 1 {
 		return fmt.Sprintf("bad arguments <%v>", args)
