@@ -10,6 +10,10 @@ import (
 )
 
 func main() {
+	runGRPCServer()
+}
+
+func runBot() {
 	log.Println("start main")
 	userStorage := memoryuserstore.New()
 	userApp := userapp.New(userStorage)

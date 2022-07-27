@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package ozon.dev.homework1.api;
+option go_package = "gitlab.ozon.dev/Hostile359/homework-1/pkg/api;api";
+
+
+service Admin {
+  rpc UserAdd(UserAddRequest) returns (UserAddResponse) {}
+  rpc UserGet(UserGetRequest) returns (UserGetResponse) {}
+  rpc UserList(UserListRequest) returns (UserListResponse) {}
+  rpc UserUpdate(UserUpdateRequest) returns (UserUpdateResponse) {}
+  rpc UserDelete(UserDeleteRequest) returns (UserDeleteResponse) {}
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// UserAdd endpoint messages
+// ---------------------------------------------------------------------------------------------------------------------
+
+message UserAddRequest {
+  uint64 id       = 1;
+  string name     = 2;
+  string password = 3;
+}
+message UserAddResponse {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// UserGet endpoint messages
+// ---------------------------------------------------------------------------------------------------------------------
+
+message UserGetRequest {
+  uint64 id       = 1;
+}
+message UserGetResponse {
+  User user = 1;
+
+  message User {
+    uint64 id       = 1;
+    string name     = 2;
+    string password = 3;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// UserList endpoint messages
+// ---------------------------------------------------------------------------------------------------------------------
+
+message UserListRequest {}
+message UserListResponse {
+  repeated User users = 1;
+
+  message User {
+    uint64 id       = 1;
+    string name     = 2;
+    string password = 3;
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// UserUpdate endpoint messages
+// ---------------------------------------------------------------------------------------------------------------------
+
+message UserUpdateRequest {
+  uint64 id       = 1;
+  string name     = 2;
+  string password = 3;
+}
+message UserUpdateResponse {}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// UserDelete endpoint messages
+// ---------------------------------------------------------------------------------------------------------------------
+
+message UserDeleteRequest {
+  uint64 id       = 1;
+}
+message UserDeleteResponse {}
