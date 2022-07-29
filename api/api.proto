@@ -5,10 +5,19 @@ option go_package = "gitlab.ozon.dev/Hostile359/homework-1/pkg/api;api";
 
 
 service Admin {
+  // Add user
   rpc UserAdd(UserAddRequest) returns (UserAddResponse) {}
+
+  // Get user
   rpc UserGet(UserGetRequest) returns (UserGetResponse) {}
+
+  // Get users list
   rpc UserList(UserListRequest) returns (UserListResponse) {}
+
+  // Update user
   rpc UserUpdate(UserUpdateRequest) returns (UserUpdateResponse) {}
+  
+  // Delete user
   rpc UserDelete(UserDeleteRequest) returns (UserDeleteResponse) {}
 }
 
