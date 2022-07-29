@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net"
 
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/api"
@@ -13,7 +14,7 @@ import (
 func runGRPCServer() {
 	listener, err := net.Listen("tcp", ":8081")
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 
 	grpcServer := grpc.NewServer()
@@ -22,6 +23,6 @@ func runGRPCServer() {
 	pb.RegisterAdminServer(grpcServer, api.New(*userApp))
 
 	if err = grpcServer.Serve(listener); err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 }
