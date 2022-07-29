@@ -19,20 +19,18 @@ const (
 	deleteCmd = "delete"
 )
 
-type CommandFunc func([]string) string
+type CommandFunc func([]string, context.Context) string
 
 type CommandHandler struct {
 	route map[string]CommandFunc
 	client pb.AdminClient
-	ctx context.Context
 }
 
-func NewCommandHandler(client pb.AdminClient, ctx context.Context) *CommandHandler {
+func NewCommandHandler(client pb.AdminClient) *CommandHandler {
 	route := make(map[string]CommandFunc)
 	cH := CommandHandler{
 		route: route,
 		client: client,
-		ctx: ctx,
 	}
 
 	route[helpCmd] = cH.helpFunc
@@ -45,7 +43,7 @@ func NewCommandHandler(client pb.AdminClient, ctx context.Context) *CommandHandl
 	return &cH
 }
 
-func (c *CommandHandler) HandleCommand(cmd string) string {
+func (c *CommandHandler) HandleCommand(cmd string, ctx context.Context) string {
 	args := strings.Fields(cmd)
 	cmd = args[0]
 
@@ -54,10 +52,10 @@ func (c *CommandHandler) HandleCommand(cmd string) string {
 		return "Unknown command, use /help to get info about available commands"
 	}
 
-	return cmdFunc(args[1:])
+	return cmdFunc(args[1:], ctx)
 }
 
-func (*CommandHandler) helpFunc(s []string) string {
+func (*CommandHandler) helpFunc(s []string, _ context.Context) string {
 	return "/help - list commands\n" +
 		"/add <name> <password> - add new user with name and password\n" +
 		"/update <used_id> <new_name> <new_password> - update user's name and password\n" +
@@ -66,7 +64,7 @@ func (*CommandHandler) helpFunc(s []string) string {
 		"/delete <used_id> - delete user"
 }
 
-func (c *CommandHandler) addFunc(args []string) string {
+func (c *CommandHandler) addFunc(args []string, ctx context.Context) string {
 	if len(args) != 3 {
 		return fmt.Sprintf("bad arguments <%v>", args)
 	}
@@ -84,7 +82,7 @@ func (c *CommandHandler) addFunc(args []string) string {
 		Password: password,
 	}
 
-	response, err := c.client.UserAdd(c.ctx, &req)
+	response, err := c.client.UserAdd(ctx, &req)
 	if err != nil {
 		return err.Error()
 	}
@@ -92,7 +90,7 @@ func (c *CommandHandler) addFunc(args []string) string {
 	return fmt.Sprint(response)
 }
 
-func (c *CommandHandler) updateFunc(args []string) string {
+func (c *CommandHandler) updateFunc(args []string, ctx context.Context) string {
 	if len(args) != 3 {
 		return fmt.Sprintf("bad arguments <%v>", args)
 	}
@@ -110,7 +108,7 @@ func (c *CommandHandler) updateFunc(args []string) string {
 		Password: password,
 	}
 
-	response, err := c.client.UserUpdate(c.ctx, &req)
+	response, err := c.client.UserUpdate(ctx, &req)
 	if err != nil {
 		return err.Error()
 	}
@@ -118,7 +116,7 @@ func (c *CommandHandler) updateFunc(args []string) string {
 	return fmt.Sprint(response)
 }
 
-func (c *CommandHandler) getFunc(args []string) string {
+func (c *CommandHandler) getFunc(args []string, ctx context.Context) string {
 	if len(args) != 1 {
 		return fmt.Sprintf("bad arguments <%v>", args)
 	}
@@ -132,7 +130,7 @@ func (c *CommandHandler) getFunc(args []string) string {
 		Id: userId,
 	}
 
-	response, err := c.client.UserGet(c.ctx, &req)
+	response, err := c.client.UserGet(ctx, &req)
 	if err != nil {
 		return err.Error()
 	}
@@ -140,10 +138,10 @@ func (c *CommandHandler) getFunc(args []string) string {
 	return fmt.Sprint(response)
 }
 
-func (c *CommandHandler) listFunc(_ []string) string {
+func (c *CommandHandler) listFunc(_ []string, ctx context.Context) string {
 	req := pb.UserListRequest{}
 
-	response, err := c.client.UserList(c.ctx, &req)
+	response, err := c.client.UserList(ctx, &req)
 	if err != nil {
 		return err.Error()
 	}
@@ -151,7 +149,7 @@ func (c *CommandHandler) listFunc(_ []string) string {
 	return fmt.Sprint(response)
 }
 
-func (c *CommandHandler) deleteFunc(args []string) string {
+func (c *CommandHandler) deleteFunc(args []string, ctx context.Context) string {
 	if len(args) != 1 {
 		return fmt.Sprintf("bad arguments <%v>", args)
 	}
@@ -165,7 +163,7 @@ func (c *CommandHandler) deleteFunc(args []string) string {
 		Id: userId,
 	}
 
-	response, err := c.client.UserDelete(c.ctx, &req)
+	response, err := c.client.UserDelete(ctx, &req)
 	if err != nil {
 		return err.Error()
 	}

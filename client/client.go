@@ -19,17 +19,16 @@ func main() {
 	defer conns.Close()
 
 	client := pb.NewAdminClient(conns)
-
 	ctx := context.Background()
-
-	cmdHandler := NewCommandHandler(client, ctx)
-	fmt.Println(cmdHandler.HandleCommand("help"))
+	cmdHandler := NewCommandHandler(client)
+	fmt.Println(cmdHandler.HandleCommand("help", ctx))
 	sc := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("Enter command:")
 		sc.Scan()
 		cmd := sc.Text()
-		response := cmdHandler.HandleCommand(cmd)
+		ctx := context.Background()
+		response := cmdHandler.HandleCommand(cmd, ctx)
 		fmt.Printf("response: [%v]\n", response)
 	}
 }
