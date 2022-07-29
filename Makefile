@@ -16,6 +16,9 @@ clean:
 	rm -rf bin
 	rm config/apikey.go
 
+grpc_api:
+	buf generate api
+
 LOCAL_BIN:=$(CURDIR)/bin
 .PHONY: .deps
 .deps:
