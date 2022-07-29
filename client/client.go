@@ -24,9 +24,12 @@ func main() {
 	fmt.Println(cmdHandler.HandleCommand("help", ctx))
 	sc := bufio.NewScanner(os.Stdin)
 	for {
-		fmt.Print("Enter command:")
+		fmt.Print("Enter command(or exit to stop):")
 		sc.Scan()
 		cmd := sc.Text()
+		if cmd == "exit" {
+			break
+		}
 		ctx := context.Background()
 		response := cmdHandler.HandleCommand(cmd, ctx)
 		fmt.Printf("response: [%v]\n", response)
