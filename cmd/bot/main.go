@@ -10,13 +10,15 @@ import (
 )
 
 func main() {
-	runGRPCServer()
-}
-
-func runBot() {
-	log.Println("start main")
 	userStorage := memoryuserstore.New()
 	userApp := userapp.New(userStorage)
+	go runBot(userApp)
+	go runREST()
+	runGRPCServer(userApp)
+}
+
+func runBot(userApp *userapp.App) {
+	log.Println("start bot")
 	commandHandler := commandhandler.New(*userApp)
 
 	cmd := commander.MustNew(commandHandler)

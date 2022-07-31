@@ -22,10 +22,15 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AdminClient interface {
+	// Add user
 	UserAdd(ctx context.Context, in *UserAddRequest, opts ...grpc.CallOption) (*UserAddResponse, error)
+	// Get user
 	UserGet(ctx context.Context, in *UserGetRequest, opts ...grpc.CallOption) (*UserGetResponse, error)
+	// Get users list
 	UserList(ctx context.Context, in *UserListRequest, opts ...grpc.CallOption) (*UserListResponse, error)
+	// Update user
 	UserUpdate(ctx context.Context, in *UserUpdateRequest, opts ...grpc.CallOption) (*UserUpdateResponse, error)
+	// Delete user
 	UserDelete(ctx context.Context, in *UserDeleteRequest, opts ...grpc.CallOption) (*UserDeleteResponse, error)
 }
 
@@ -86,10 +91,15 @@ func (c *adminClient) UserDelete(ctx context.Context, in *UserDeleteRequest, opt
 // All implementations must embed UnimplementedAdminServer
 // for forward compatibility
 type AdminServer interface {
+	// Add user
 	UserAdd(context.Context, *UserAddRequest) (*UserAddResponse, error)
+	// Get user
 	UserGet(context.Context, *UserGetRequest) (*UserGetResponse, error)
+	// Get users list
 	UserList(context.Context, *UserListRequest) (*UserListResponse, error)
+	// Update user
 	UserUpdate(context.Context, *UserUpdateRequest) (*UserUpdateResponse, error)
+	// Delete user
 	UserDelete(context.Context, *UserDeleteRequest) (*UserDeleteResponse, error)
 	mustEmbedUnimplementedAdminServer()
 }
