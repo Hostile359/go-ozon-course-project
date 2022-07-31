@@ -14,6 +14,10 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+const (
+	SwaggerDir       = "./swagger"
+)
+
 func runGRPCServer(userApp *userapp.App) {
 	listener, err := net.Listen("tcp", ":8081")
 	if err != nil {
@@ -40,7 +44,13 @@ func runREST() {
 		log.Fatalln(err)
 	}
 
-	if err := http.ListenAndServe(":8080", mux); err != nil {
+	http_mux := http.NewServeMux()
+	http_mux.Handle("/", mux)
+
+	fs := http.FileServer(http.Dir(SwaggerDir))
+	http_mux.Handle("/swagger/", http.StripPrefix("/swagger/", fs))
+
+	if err := http.ListenAndServe(":8080", http_mux); err != nil {
 		log.Fatalln(err)
 	}
 }
