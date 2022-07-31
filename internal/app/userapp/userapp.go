@@ -15,7 +15,7 @@ type Storage interface {
 	Add(user.User) error
 	Update(user.User) error
 	Get(user.UserId) (*user.User, error)
-	List() []user.User
+	List() ([]user.User, error)
 	Delete(user.UserId) error
 }
 
@@ -55,7 +55,7 @@ func (a App) Get(id user.UserId)  (*user.User, error) {
 	return a.userStorage.Get(id)
 }
 
-func (a App) List() []user.User {
+func (a App) List() ([]user.User, error) {
 	return a.userStorage.List()
 }
 

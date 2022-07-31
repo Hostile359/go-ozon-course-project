@@ -56,7 +56,11 @@ func (i *implementation) UserGet(ctx context.Context, in *pb.UserGetRequest) (*p
 }
 
 func (i *implementation) UserList(ctx context.Context, in *pb.UserListRequest) (*pb.UserListResponse, error) {
-	usersList := i.userApp.List()
+	usersList, err := i.userApp.List()
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
 	res := make([]*pb.UserListResponse_User, 0, len(usersList))
 
 	for _, u := range usersList {

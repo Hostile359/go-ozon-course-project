@@ -135,7 +135,11 @@ func (c *CommandHandler) getFunc(data string) string {
 }
 
 func (c *CommandHandler) listFunc(data string) string {
-	usersList := c.userApp.List()
+	usersList, err := c.userApp.List()
+	if err != nil {
+		return "internal error"
+	}
+	
 	res := make([]string, 0, len(usersList)+1)
 	res = append(res, "Users list:")
 	for _, u := range usersList {
