@@ -25,7 +25,7 @@ func New(userApp userapp.App) pb.AdminServer {
 
 func (i *implementation) UserAdd(ctx context.Context, in *pb.UserAddRequest) (*pb.UserAddResponse, error) {
 	u := user.NewUser(user.UserId(in.GetId()), in.GetName(), in.GetPassword())
-	if err := i.userApp.Add(u); err != nil {
+	if err := i.userApp.Add(ctx, u); err != nil {
 		if errors.Is(err, userapp.ErrValidationArgs) {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		} else if errors.Is(err, userapp.ErrUserExists) {
@@ -38,7 +38,7 @@ func (i *implementation) UserAdd(ctx context.Context, in *pb.UserAddRequest) (*p
 }
 
 func (i *implementation) UserGet(ctx context.Context, in *pb.UserGetRequest) (*pb.UserGetResponse, error) {
-	u, err := i.userApp.Get(user.UserId(in.GetId()))
+	u, err := i.userApp.Get(ctx, user.UserId(in.GetId()))
 	if err != nil {
 		if errors.Is(err, userapp.ErrUserNotExists) {
 			return nil, status.Error(codes.NotFound, err.Error())
@@ -56,7 +56,7 @@ func (i *implementation) UserGet(ctx context.Context, in *pb.UserGetRequest) (*p
 }
 
 func (i *implementation) UserList(ctx context.Context, in *pb.UserListRequest) (*pb.UserListResponse, error) {
-	usersList, err := i.userApp.List()
+	usersList, err := i.userApp.List(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -78,7 +78,7 @@ func (i *implementation) UserList(ctx context.Context, in *pb.UserListRequest) (
 
 func (i *implementation) UserUpdate(ctx context.Context, in *pb.UserUpdateRequest) (*pb.UserUpdateResponse, error) {
 	u := user.NewUser(user.UserId(in.GetId()), in.GetName(), in.GetPassword())
-	if err := i.userApp.Update(u); err != nil {
+	if err := i.userApp.Update(ctx, u); err != nil {
 		if errors.Is(err, userapp.ErrValidationArgs) {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		} else if errors.Is(err, userapp.ErrUserNotExists) {
@@ -91,7 +91,7 @@ func (i *implementation) UserUpdate(ctx context.Context, in *pb.UserUpdateReques
 }
 
 func (i *implementation) UserDelete(ctx context.Context, in *pb.UserDeleteRequest) (*pb.UserDeleteResponse, error) {
-	if err := i.userApp.Delete(user.UserId(in.GetId())); err != nil {
+	if err := i.userApp.Delete(ctx, user.UserId(in.GetId())); err != nil {
 		if errors.Is(err, userapp.ErrUserNotExists) {
 			return nil, status.Error(codes.NotFound, err.Error())
 		}
