@@ -1,6 +1,7 @@
 package commandhandler
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
@@ -77,7 +78,7 @@ func (c *CommandHandler) addFunc(data string) string {
 	name, password := args[0], args[1]
 	u := user.NewUser(c.lastId, name, password)
 
-	if err := c.userApp.Add(u); err != nil {
+	if err := c.userApp.Add(context.Background(), u); err != nil {
 		if errors.Is(err, userapp.ErrValidationArgs) || errors.Is(err, userapp.ErrUserExists) {
 			return err.Error()
 		}
@@ -103,7 +104,7 @@ func (c *CommandHandler) updateFunc(data string) string {
 	name, password := args[1], args[2]
 	u := user.NewUser(userId, name, password)
 
-	if err := c.userApp.Update(u); err != nil {
+	if err := c.userApp.Update(context.Background(), u); err != nil {
 		if errors.Is(err, userapp.ErrValidationArgs) || errors.Is(err, userapp.ErrUserNotExists) {
 			return err.Error()
 		}
@@ -124,7 +125,7 @@ func (c *CommandHandler) getFunc(data string) string {
 		return err.Error()
 	}
 
-	u, err := c.userApp.Get(userId)
+	u, err := c.userApp.Get(context.Background(), userId)
 	if err != nil {
 		if errors.Is(err, userapp.ErrUserNotExists) {
 			return err.Error()
@@ -135,7 +136,11 @@ func (c *CommandHandler) getFunc(data string) string {
 }
 
 func (c *CommandHandler) listFunc(data string) string {
-	usersList := c.userApp.List()
+	usersList, err := c.userApp.List(context.Background())
+	if err != nil {
+		return "internal error"
+	}
+	
 	res := make([]string, 0, len(usersList)+1)
 	res = append(res, "Users list:")
 	for _, u := range usersList {
@@ -155,7 +160,7 @@ func (c *CommandHandler) deleteFunc(data string) string {
 		return err.Error()
 	}
 
-	if err := c.userApp.Delete(userId); err != nil {
+	if err := c.userApp.Delete(context.Background(), userId); err != nil {
 		if errors.Is(err, userapp.ErrUserNotExists) {
 			return err.Error()
 		}

@@ -1,8 +1,15 @@
 package userapp
 
 import (
+	"context"
+	"time"
+
 	"github.com/pkg/errors"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/entities/user"
+)
+
+const (
+	storageTimeout = 10*time.Second
 )
 
 var (
@@ -12,11 +19,11 @@ var (
 )
 
 type Storage interface {
-	Add(user.User) error
-	Update(user.User) error
-	Get(user.UserId) (*user.User, error)
-	List() []user.User
-	Delete(user.UserId) error
+	Add(context.Context, user.User) error
+	Update(context.Context, user.User) error
+	Get(context.Context, user.UserId) (*user.User, error)
+	List(context.Context) ([]user.User, error)
+	Delete(context.Context, user.UserId) error
 }
 
 type App struct {
@@ -29,7 +36,7 @@ func New(userStorage Storage) *App {
 	}
 }
 
-func (a *App) Add(u user.User) error {
+func (a *App) Add(ctx context.Context, u user.User) error {
 	if err := checkName(u.GetName()); err != nil {
 		return err
 	}
@@ -37,10 +44,13 @@ func (a *App) Add(u user.User) error {
 		return err
 	}
 	
-	return a.userStorage.Add(u)
+	ctx, cancel := context.WithTimeout(ctx, storageTimeout)
+	defer cancel()
+
+	return a.userStorage.Add(ctx, u)
 }
 
-func (a *App) Update(u user.User) error {
+func (a *App) Update(ctx context.Context, u user.User) error {
 	if err := checkName(u.GetName()); err != nil {
 		return err
 	}
@@ -48,19 +58,31 @@ func (a *App) Update(u user.User) error {
 		return err
 	}
 
-	return a.userStorage.Update(u)
+	ctx, cancel := context.WithTimeout(ctx, storageTimeout)
+	defer cancel()
+
+	return a.userStorage.Update(ctx, u)
 }
 
-func (a App) Get(id user.UserId)  (*user.User, error) {
-	return a.userStorage.Get(id)
+func (a App) Get(ctx context.Context, id user.UserId)  (*user.User, error) {
+	ctx, cancel := context.WithTimeout(ctx, storageTimeout)
+	defer cancel()
+
+	return a.userStorage.Get(ctx, id)
 }
 
-func (a App) List() []user.User {
-	return a.userStorage.List()
+func (a App) List(ctx context.Context) ([]user.User, error) {
+	ctx, cancel := context.WithTimeout(ctx, storageTimeout)
+	defer cancel()
+
+	return a.userStorage.List(ctx)
 }
 
-func (a *App)Delete(id user.UserId) error {
-	return a.userStorage.Delete(id)
+func (a *App)Delete(ctx context.Context, id user.UserId) error {
+	ctx, cancel := context.WithTimeout(ctx, storageTimeout)
+	defer cancel()
+	
+	return a.userStorage.Delete(ctx, id)
 }
 
 func checkName(name string) error {
