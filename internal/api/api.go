@@ -56,7 +56,7 @@ func (i *implementation) UserGet(ctx context.Context, in *pb.UserGetRequest) (*p
 }
 
 func (i *implementation) UserList(ctx context.Context, in *pb.UserListRequest) (*pb.UserListResponse, error) {
-	usersList, err := i.userApp.List(ctx)
+	usersList, err := i.userApp.List(ctx, in.Page, in.PerPage)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

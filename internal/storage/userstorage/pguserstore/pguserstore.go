@@ -84,9 +84,12 @@ func (s *Storage) Get(ctx context.Context, id user.UserId) (*user.User, error) {
 	return &users[0], nil
 }
 
-func (s *Storage) List(ctx context.Context) ([]user.User, error) {
+func (s *Storage) List(ctx context.Context, offset, limit uint64) ([]user.User, error) {
 	query, args, err := squirrel.Select("id, name, password").
 		From("users").
+		Offset(offset).
+		Limit(limit).
+		OrderBy("id").
 		PlaceholderFormat(squirrel.Dollar).ToSql()
 	
 	if err != nil {

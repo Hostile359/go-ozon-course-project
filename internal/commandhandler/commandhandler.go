@@ -136,7 +136,7 @@ func (c *CommandHandler) getFunc(data string) string {
 }
 
 func (c *CommandHandler) listFunc(data string) string {
-	usersList, err := c.userApp.List(context.Background())
+	usersList, err := c.userApp.List(context.Background(), 0, 0)
 	if err != nil {
 		return "internal error"
 	}

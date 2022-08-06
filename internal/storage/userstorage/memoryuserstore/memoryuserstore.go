@@ -89,7 +89,7 @@ func (s *Storage) Get(ctx context.Context, id user.UserId) (*user.User, error) {
 	return &u, nil
 }
 
-func (s *Storage) List(ctx context.Context) ([]user.User, error) {
+func (s *Storage) List(ctx context.Context, offset, limit uint64) ([]user.User, error) {
 	select {
 	case s.poolCh <- struct{}{}:
 		defer func() { <-s.poolCh }()

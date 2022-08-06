@@ -10,6 +10,8 @@ import (
 
 const (
 	storageTimeout = 10*time.Second
+	pageDefault = 1
+	perPageDefault = 5
 )
 
 var (
@@ -22,7 +24,7 @@ type Storage interface {
 	Add(context.Context, user.User) error
 	Update(context.Context, user.User) error
 	Get(context.Context, user.UserId) (*user.User, error)
-	List(context.Context) ([]user.User, error)
+	List(context.Context, uint64, uint64) ([]user.User, error)
 	Delete(context.Context, user.UserId) error
 }
 
@@ -71,11 +73,20 @@ func (a App) Get(ctx context.Context, id user.UserId)  (*user.User, error) {
 	return a.userStorage.Get(ctx, id)
 }
 
-func (a App) List(ctx context.Context) ([]user.User, error) {
+func (a App) List(ctx context.Context, page, perPage uint64) ([]user.User, error) {
 	ctx, cancel := context.WithTimeout(ctx, storageTimeout)
 	defer cancel()
 
-	return a.userStorage.List(ctx)
+	if page == 0 {
+		page = pageDefault
+	}
+	if perPage == 0 {
+		perPage = perPageDefault
+	}
+
+	offset := (page - 1) * perPage
+	limit := perPage
+	return a.userStorage.List(ctx, offset, limit)
 }
 
 func (a *App)Delete(ctx context.Context, id user.UserId) error {
