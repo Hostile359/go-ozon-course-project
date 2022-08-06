@@ -7,41 +7,41 @@ import (
 type UserId uint
 
 type User struct {
-	id       UserId
-	name     string
-	password string
+	Id       UserId `db:"id"`
+	Name     string `db:"name"`
+	Password string	`db:"password"`
 }
 
 func NewUser(id UserId, name, password string) User {
 	u := User{
-		id: id,
-		name: name,
-		password: password,
+		Id: id,
+		Name: name,
+		Password: password,
 	}
 
 	return u
 }
 
 func (u *User) SetName(name string) {
-	u.name = name
+	u.Name = name
 }
 
 func (u *User) SetPassword(pwd string) {
-	u.password = pwd
+	u.Password = pwd
 }
 
 func (u User) String() string {
-	return fmt.Sprintf("%d: %s / %s", u.id, u.name, u.password)
+	return fmt.Sprintf("%d: %s / %s", u.Id, u.Name, u.Password)
 }
 
 func (u User) GetName() string {
-	return u.name
+	return u.Name
 }
 
 func (u User) GetPassword() string {
-	return u.password
+	return u.Password
 }
 
 func (u User) GetId() UserId {
-	return u.id
+	return u.Id
 }
