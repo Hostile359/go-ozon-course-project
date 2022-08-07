@@ -17,7 +17,12 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	psqlConn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", Host, Port, User, Password, DBname)
+	cfg, err := NewConfig()
+	if err != nil {
+		log.Fatal("Error while loading config: ", err)
+	}
+
+	psqlConn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.DBname)
 	pool, err := pgxpool.Connect(ctx, psqlConn)
 	if err != nil {
 		log.Fatal("can't connect to database", err)
@@ -29,10 +34,10 @@ func main() {
 	}
 
 	config := pool.Config()
-	config.MaxConnIdleTime = MaxConnIdleTime
-	config.MaxConnLifetime = MaxConnLifetime
-	config.MinConns = MinConns
-	config.MaxConns = MaxConns
+	config.MaxConnIdleTime = cfg.MaxConnIdleTime
+	config.MaxConnLifetime = cfg.MaxConnLifetime
+	config.MinConns = cfg.MinConns
+	config.MaxConns = cfg.MaxConns
 	userStorage := pguserstore.New(pool)
 	// userStorage := memoryuserstore.New()
 

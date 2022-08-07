@@ -1,6 +1,6 @@
 .PHONY: run
 run:
-	go run cmd/bot/main.go cmd/bot/server.go cmd/bot/pgconfig.go
+	go run cmd/bot/main.go cmd/bot/server.go cmd/bot/pgconfig.go --local
 
 grpc_client:
 	go run client/client.go client/handler.go
