@@ -29,8 +29,8 @@ func New(pool *pgxpool.Pool) userapp.Storage {
 
 func (s *Storage) Add(ctx context.Context, u user.User) error {
 	query, args, err := squirrel.Insert("users").
-		Columns("id, name, password").
-		Values(u.GetId(), u.GetName(), u.GetPassword()).
+		Columns("name, password").
+		Values(u.GetName(), u.GetPassword()).
 		PlaceholderFormat(squirrel.Dollar).ToSql()
 	if err != nil {
 		return errors.Errorf("Storage.Add: to sql: %v", err)

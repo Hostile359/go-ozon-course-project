@@ -24,7 +24,7 @@ func New(userApp userapp.App) pb.AdminServer {
 }
 
 func (i *implementation) UserAdd(ctx context.Context, in *pb.UserAddRequest) (*pb.UserAddResponse, error) {
-	u := user.NewUser(user.UserId(in.GetId()), in.GetName(), in.GetPassword())
+	u := user.NewUser(0, in.GetName(), in.GetPassword())
 	if err := i.userApp.Add(ctx, u); err != nil {
 		if errors.Is(err, userapp.ErrValidationArgs) {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
