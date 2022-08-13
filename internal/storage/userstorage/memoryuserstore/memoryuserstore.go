@@ -20,6 +20,7 @@ type Storage struct {
 	data   map[user.UserId]user.User
 	mu     sync.RWMutex
 	poolCh chan struct{}
+	lastId user.UserId
 }
 
 func New() userapp.Storage {
@@ -27,6 +28,7 @@ func New() userapp.Storage {
 		data:   make(map[user.UserId]user.User),
 		mu:     sync.RWMutex{},
 		poolCh: make(chan struct{}, poolSize),
+		lastId: 1,
 	}
 }
 
@@ -41,11 +43,13 @@ func (s *Storage) Add(ctx context.Context, u user.User) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	id := u.GetId()
+	id := s.lastId
+	u.Id = s.lastId
 	if _, ok := s.data[id]; ok {
 		return errors.Wrapf(userapp.ErrUserExists, "user-id: [%d]", id)
 	}
 	s.data[id] = u
+	s.lastId += 1
 
 	return nil
 }
@@ -89,7 +93,7 @@ func (s *Storage) Get(ctx context.Context, id user.UserId) (*user.User, error) {
 	return &u, nil
 }
 
-func (s *Storage) List(ctx context.Context) ([]user.User, error) {
+func (s *Storage) List(ctx context.Context, offset, limit uint64) ([]user.User, error) {
 	select {
 	case s.poolCh <- struct{}{}:
 		defer func() { <-s.poolCh }()

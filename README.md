@@ -18,6 +18,19 @@ To prepare project enviroment you need to set up your tg apikey:
 
 ```make prepare APIKEY="<your_tg_apikey>"```
 
+## Prepare DB
+Build and start docker compose
+
+```make up-db```
+
+Make migrations
+
+```./migrate.sh```
+
+Stop docker compose
+
+```make down-db```
+
 ## Run
 Run server
 

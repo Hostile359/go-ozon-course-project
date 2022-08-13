@@ -51,7 +51,6 @@ service Admin {
 // ---------------------------------------------------------------------------------------------------------------------
 
 message UserAddRequest {
-  uint64 id       = 1;
   string name     = 2;
   string password = 3;
 }
@@ -78,7 +77,10 @@ message UserGetResponse {
 // UserList endpoint messages
 // ---------------------------------------------------------------------------------------------------------------------
 
-message UserListRequest {}
+message UserListRequest {
+  uint64 page     = 1;
+  uint64 per_page = 2;
+}
 message UserListResponse {
   repeated User users = 1;
 

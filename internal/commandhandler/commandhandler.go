@@ -26,7 +26,6 @@ type CommandFunc func(string) string
 type CommandHandler struct {
 	route map[string]CommandFunc
 	userApp userapp.App
-	lastId user.UserId
 }
 
 func New(userApp userapp.App) *CommandHandler {
@@ -34,7 +33,6 @@ func New(userApp userapp.App) *CommandHandler {
 	cH := CommandHandler{
 		userApp: userApp,
 		route: route,
-		lastId: 1,
 	}
 
 	route[startCmd] = cH.startFunc
@@ -76,7 +74,7 @@ func (c *CommandHandler) addFunc(data string) string {
 		return fmt.Sprintf("bad arguments <%v>", args)
 	}
 	name, password := args[0], args[1]
-	u := user.NewUser(c.lastId, name, password)
+	u := user.NewUser(0, name, password)
 
 	if err := c.userApp.Add(context.Background(), u); err != nil {
 		if errors.Is(err, userapp.ErrValidationArgs) || errors.Is(err, userapp.ErrUserExists) {
@@ -84,8 +82,6 @@ func (c *CommandHandler) addFunc(data string) string {
 		}
 		return "internal error"
 	}
-
-	c.lastId += 1
 
 	return "user added"
 }
@@ -136,7 +132,7 @@ func (c *CommandHandler) getFunc(data string) string {
 }
 
 func (c *CommandHandler) listFunc(data string) string {
-	usersList, err := c.userApp.List(context.Background())
+	usersList, err := c.userApp.List(context.Background(), 0, 0)
 	if err != nil {
 		return "internal error"
 	}

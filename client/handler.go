@@ -65,19 +65,13 @@ func (*CommandHandler) helpFunc(s []string, _ context.Context) string {
 }
 
 func (c *CommandHandler) addFunc(args []string, ctx context.Context) string {
-	if len(args) != 3 {
+	if len(args) != 2 {
 		return fmt.Sprintf("bad arguments <%v>", args)
 	}
 
-	userId, err := checkId(args[0])
-	if err != nil {
-		return err.Error()
-	}
-
-	name, password := args[1], args[2]
+	name, password := args[0], args[1]
 
 	req := pb.UserAddRequest{
-		Id: userId,
 		Name: name,
 		Password: password,
 	}
