@@ -1,18 +1,15 @@
-package commentapi
+package commentdbapi
 
 import (
 	"context"
 
 	"github.com/pkg/errors"
-	// "gitlab.ozon.dev/Hostile359/homework-1/internal/app/commentapp"
-	// "gitlab.ozon.dev/Hostile359/homework-1/internal/entities/comment"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/app/commentapp"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/app/userapp"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/entities/comment"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/entities/user"
 	pb "gitlab.ozon.dev/Hostile359/homework-1/pkg/api"
 
-	// "google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

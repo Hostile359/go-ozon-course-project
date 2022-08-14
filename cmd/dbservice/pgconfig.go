@@ -10,7 +10,8 @@ import (
 
 type Config struct {
 	Host            string        `envconfig:"HOST" default:"localhost"`
-	Port            int           `envconfig:"PORT" default:"5432"`
+	DBGrpcPort      string        `envconfig:"DB_GRPC_PORT" default:":8082"`
+	DBPort          int           `envconfig:"DB_PORT" default:"5432"`
 	User            string        `envconfig:"DB_USER" required:"true"`
 	Password        string        `envconfig:"DB_PASSWORD" required:"true"`
 	DBname          string        `envconfig:"DBNAME" required:"true"`

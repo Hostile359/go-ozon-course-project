@@ -32,10 +32,14 @@ Stop docker compose
 ```make down-db```
 
 ## Run
-Run server
+Run db service
 
-```make run```
+```make run-db```
 
-Run test client
+Run valid service
+
+```make run-valid```
+
+Run test client (out of date)
 
 ```make grpc_client```

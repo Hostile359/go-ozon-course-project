@@ -17,7 +17,7 @@ const (
 
 var (
 	ErrCommentNotExists = errors.New("comment does not exist")
-	ErrCommentWrongUsedId = errors.New("comment has another user id")
+	ErrCommentWrongUserId = errors.New("comment has another user id")
 )
 
 type Storage interface {
@@ -60,7 +60,7 @@ func (a *App) Update(ctx context.Context, c comment.Comment) error {
 		return err
 	}
 	if c.GetUserId() != oldComment.GetUserId() {
-		return ErrCommentWrongUsedId
+		return ErrCommentWrongUserId
 	}
 
 	return a.commentStorage.Update(ctx, c)
