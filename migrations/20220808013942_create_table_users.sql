@@ -9,5 +9,5 @@ CREATE TABLE IF NOT EXISTS public.users (
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS public.users;
+DROP TABLE IF EXISTS public.users CASCADE;
 -- +goose StatementEnd

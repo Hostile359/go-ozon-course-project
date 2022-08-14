@@ -6,10 +6,13 @@ import (
 	"log"
 
 	"github.com/jackc/pgx/v4/pgxpool"
+	"gitlab.ozon.dev/Hostile359/homework-1/internal/app/commentapp"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/app/userapp"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/commander"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/commandhandler"
+
 	// "gitlab.ozon.dev/Hostile359/homework-1/internal/storage/userstorage/memoryuserstore"
+	"gitlab.ozon.dev/Hostile359/homework-1/internal/storage/commentstorage/pgcommentstore"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/storage/userstorage/pguserstore"
 )
 
@@ -39,12 +42,14 @@ func main() {
 	config.MinConns = cfg.MinConns
 	config.MaxConns = cfg.MaxConns
 	userStorage := pguserstore.New(pool)
+	commentStorage := pgcommentstore.New(pool)
 	// userStorage := memoryuserstore.New()
 
 	userApp := userapp.New(userStorage)
+	commentApp := commentapp.New(commentStorage, *userApp)
 	go runBot(userApp)
 	go runREST()
-	runGRPCServer(userApp)
+	runGRPCServer(userApp, commentApp)
 }
 
 func runBot(userApp *userapp.App) {

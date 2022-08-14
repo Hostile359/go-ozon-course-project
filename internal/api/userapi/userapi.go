@@ -1,4 +1,4 @@
-package api
+package userapi
 
 import (
 	"context"
@@ -13,11 +13,11 @@ import (
 )
 
 type implementation struct {
-	pb.UnimplementedAdminServer
+	pb.UnimplementedUserServer
 	userApp userapp.App
 }
 
-func New(userApp userapp.App) pb.AdminServer {
+func New(userApp userapp.App) pb.UserServer {
 	return &implementation{
 		userApp: userApp,
 	}

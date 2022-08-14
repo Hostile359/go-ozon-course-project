@@ -6,107 +6,107 @@ option go_package = "gitlab.ozon.dev/Hostile359/homework-1/pkg/api;api";
 import "google/api/annotations.proto";
 
 
-service Admin {
-  // Add user
-  rpc UserAdd(UserAddRequest) returns (UserAddResponse) {
+service Comment {
+  // Add comment
+  rpc CommentAdd(CommentAddRequest) returns (CommentAddResponse) {
     option (google.api.http) = {
-      post: "/v1/user"
+      post: "/v1/comment"
       body: "*"
     };
   }
 
-  // Get user
-  rpc UserGet(UserGetRequest) returns (UserGetResponse) {
+  // Get comment
+  rpc CommentGet(CommentGetRequest) returns (CommentGetResponse) {
     option (google.api.http) = {
-      get: "/v1/user/{id}"
+      get: "/v1/comment/{id}"
     };
   }
 
-  // Get users list
-  rpc UserList(UserListRequest) returns (UserListResponse) {
+  // Get Comments list
+  rpc CommentList(CommentListRequest) returns (CommentListResponse) {
     option (google.api.http) = {
-      get: "/v1/users"
+      get: "/v1/comments"
     };
   }
 
-  // Update user
-  rpc UserUpdate(UserUpdateRequest) returns (UserUpdateResponse) {
+  // Update Comment
+  rpc CommentUpdate(CommentUpdateRequest) returns (CommentUpdateResponse) {
     option (google.api.http) = {
-      put: "/v1/user"
+      put: "/v1/comment"
       body: "*"
     };
   }
   
-  // Delete user
-  rpc UserDelete(UserDeleteRequest) returns (UserDeleteResponse) {
+  // Delete Comment
+  rpc CommentDelete(CommentDeleteRequest) returns (CommentDeleteResponse) {
     option (google.api.http) = {
-      delete: "/v1/user"
+      delete: "/v1/comment"
       body: "*"
     };
   }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-// UserAdd endpoint messages
+// CommentAdd endpoint messages
 // ---------------------------------------------------------------------------------------------------------------------
 
-message UserAddRequest {
-  string name     = 2;
-  string password = 3;
+message CommentAddRequest {
+  string comment = 2;
+  uint64 user_id = 3;
 }
-message UserAddResponse {}
+message CommentAddResponse {}
 
 // ---------------------------------------------------------------------------------------------------------------------
-// UserGet endpoint messages
+// CommentGet endpoint messages
 // ---------------------------------------------------------------------------------------------------------------------
 
-message UserGetRequest {
+message CommentGetRequest {
   uint64 id       = 1;
 }
-message UserGetResponse {
-  User user = 1;
+message CommentGetResponse {
+  Comment comment = 1;
 
-  message User {
+  message Comment {
     uint64 id       = 1;
-    string name     = 2;
-    string password = 3;
+    string comment  = 2;
+    uint64 user_id  = 3;
   }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-// UserList endpoint messages
+// CommentList endpoint messages
 // ---------------------------------------------------------------------------------------------------------------------
 
-message UserListRequest {
+message CommentListRequest {
   uint64 page     = 1;
   uint64 per_page = 2;
 }
-message UserListResponse {
-  repeated User users = 1;
+message CommentListResponse {
+  repeated Comment Comments = 1;
 
-  message User {
+  message Comment {
     uint64 id       = 1;
-    string name     = 2;
-    string password = 3;
+    string comment  = 2;
+    uint64 user_id  = 3;
   }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-// UserUpdate endpoint messages
+// CommentUpdate endpoint messages
 // ---------------------------------------------------------------------------------------------------------------------
 
-message UserUpdateRequest {
-  uint64 id       = 1;
-  string name     = 2;
-  string password = 3;
+message CommentUpdateRequest {
+    uint64 id       = 1;
+    string comment  = 2;
+    uint64 user_id  = 3;
 }
-message UserUpdateResponse {}
+message CommentUpdateResponse {}
 
 // ---------------------------------------------------------------------------------------------------------------------
-// UserDelete endpoint messages
+// CommentDelete endpoint messages
 // ---------------------------------------------------------------------------------------------------------------------
 
-message UserDeleteRequest {
+message CommentDeleteRequest {
   uint64 id       = 1;
 }
-message UserDeleteResponse {}
+message CommentDeleteResponse {}
