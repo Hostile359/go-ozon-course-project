@@ -18,7 +18,7 @@ func main() {
 	}
 	defer conns.Close()
 
-	client := pb.NewAdminClient(conns)
+	client := pb.NewUserClient(conns)
 	ctx := context.Background()
 	cmdHandler := NewCommandHandler(client)
 	fmt.Println(cmdHandler.HandleCommand("help", ctx))

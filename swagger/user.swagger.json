@@ -1,12 +1,12 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "api.proto",
+    "title": "user.proto",
     "version": "version not set"
   },
   "tags": [
     {
-      "name": "Admin"
+      "name": "User"
     }
   ],
   "consumes": [
@@ -19,7 +19,7 @@
     "/v1/user": {
       "delete": {
         "summary": "Delete user",
-        "operationId": "Admin_UserDelete",
+        "operationId": "User_UserDelete",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -45,12 +45,12 @@
           }
         ],
         "tags": [
-          "Admin"
+          "User"
         ]
       },
       "post": {
         "summary": "Add user",
-        "operationId": "Admin_UserAdd",
+        "operationId": "User_UserAdd",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -76,12 +76,12 @@
           }
         ],
         "tags": [
-          "Admin"
+          "User"
         ]
       },
       "put": {
         "summary": "Update user",
-        "operationId": "Admin_UserUpdate",
+        "operationId": "User_UserUpdate",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -107,14 +107,14 @@
           }
         ],
         "tags": [
-          "Admin"
+          "User"
         ]
       }
     },
     "/v1/user/{id}": {
       "get": {
         "summary": "Get user",
-        "operationId": "Admin_UserGet",
+        "operationId": "User_UserGet",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -139,14 +139,14 @@
           }
         ],
         "tags": [
-          "Admin"
+          "User"
         ]
       }
     },
     "/v1/users": {
       "get": {
         "summary": "Get users list",
-        "operationId": "Admin_UserList",
+        "operationId": "User_UserList",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -178,7 +178,7 @@
           }
         ],
         "tags": [
-          "Admin"
+          "User"
         ]
       }
     }

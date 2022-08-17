@@ -23,10 +23,10 @@ type CommandFunc func([]string, context.Context) string
 
 type CommandHandler struct {
 	route map[string]CommandFunc
-	client pb.AdminClient
+	client pb.UserClient
 }
 
-func NewCommandHandler(client pb.AdminClient) *CommandHandler {
+func NewCommandHandler(client pb.UserClient) *CommandHandler {
 	route := make(map[string]CommandFunc)
 	cH := CommandHandler{
 		route: route,

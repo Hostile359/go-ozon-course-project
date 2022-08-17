@@ -39,13 +39,6 @@ func New(userStorage Storage) *App {
 }
 
 func (a *App) Add(ctx context.Context, u user.User) error {
-	if err := checkName(u.GetName()); err != nil {
-		return err
-	}
-	if err := checkPassword(u.GetPassword()); err != nil {
-		return err
-	}
-	
 	ctx, cancel := context.WithTimeout(ctx, storageTimeout)
 	defer cancel()
 
@@ -53,13 +46,6 @@ func (a *App) Add(ctx context.Context, u user.User) error {
 }
 
 func (a *App) Update(ctx context.Context, u user.User) error {
-	if err := checkName(u.GetName()); err != nil {
-		return err
-	}
-	if err := checkPassword(u.GetPassword()); err != nil {
-		return err
-	}
-
 	ctx, cancel := context.WithTimeout(ctx, storageTimeout)
 	defer cancel()
 
@@ -94,18 +80,4 @@ func (a *App)Delete(ctx context.Context, id user.UserId) error {
 	defer cancel()
 	
 	return a.userStorage.Delete(ctx, id)
-}
-
-func checkName(name string) error {
-	if len(name) == 0 || len(name) > 10 {
-		return errors.Wrapf(ErrValidationArgs, "<%v>, len should be from 1 to 10", name)
-	}
-	return nil
-}
-
-func checkPassword(password string) error {
-	if len(password) < 6 || len(password) > 10 {
-		return errors.Wrapf(ErrValidationArgs, "<%v>, len should be from 6 to 10", password)
-	}	
-	return nil
 }

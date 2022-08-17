@@ -1,0 +1,312 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "comment.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "Comment"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/comment": {
+      "delete": {
+        "summary": "Delete Comment",
+        "operationId": "Comment_CommentDelete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiCommentDeleteResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiCommentDeleteRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Comment"
+        ]
+      },
+      "post": {
+        "summary": "Add comment",
+        "operationId": "Comment_CommentAdd",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiCommentAddResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiCommentAddRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Comment"
+        ]
+      },
+      "put": {
+        "summary": "Update Comment",
+        "operationId": "Comment_CommentUpdate",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiCommentUpdateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiCommentUpdateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Comment"
+        ]
+      }
+    },
+    "/v1/comment/{id}": {
+      "get": {
+        "summary": "Get comment",
+        "operationId": "Comment_CommentGet",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiCommentGetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "Comment"
+        ]
+      }
+    },
+    "/v1/comments": {
+      "get": {
+        "summary": "Get Comments list",
+        "operationId": "Comment_CommentList",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiCommentListResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "Comment"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "apiCommentAddRequest": {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "apiCommentAddResponse": {
+      "type": "object"
+    },
+    "apiCommentDeleteRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "apiCommentDeleteResponse": {
+      "type": "object"
+    },
+    "apiCommentGetResponse": {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "$ref": "#/definitions/apiCommentGetResponseComment"
+        }
+      }
+    },
+    "apiCommentGetResponseComment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "apiCommentListResponse": {
+      "type": "object",
+      "properties": {
+        "Comments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/apiCommentListResponseComment"
+          }
+        }
+      }
+    },
+    "apiCommentListResponseComment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "apiCommentUpdateRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "apiCommentUpdateResponse": {
+      "type": "object"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

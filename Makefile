@@ -1,12 +1,23 @@
-.PHONY: run
-run:
-	go run cmd/bot/main.go cmd/bot/server.go cmd/bot/pgconfig.go --local
+DB_MAIN:=$(CURDIR)/cmd/dbservice
+.PHONY: run-db, build-db
+run-db:
+	go run $(DB_MAIN)/main.go $(DB_MAIN)/server.go $(DB_MAIN)/pgconfig.go --local
+
+build-db:
+	go build -o bin/db-service $(DB_MAIN)/main.go $(DB_MAIN)/server.go $(DB_MAIN)/pgconfig.go
+
+VALID_MAIN:=$(CURDIR)/cmd/validservice
+.PHONY: run-valid build-valid
+run-valid:
+	go run $(VALID_MAIN)/main.go $(VALID_MAIN)/server.go $(VALID_MAIN)/config.go --local
+
+build-valid:
+	go build -o bin/valid-service $(VALID_MAIN)/main.go $(VALID_MAIN)/server.go $(VALID_MAIN)/config.go
+
+build: build-db build-valid
 
 grpc_client:
 	go run client/client.go client/handler.go
-
-build:
-	go build -o bin/bot cmd/bot/main.go cmd/bot/server.go cmd/bot/pgconfig.go
 
 prepare:
 	mkdir -p config

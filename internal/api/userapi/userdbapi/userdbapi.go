@@ -1,4 +1,4 @@
-package api
+package userdbapi
 
 import (
 	"context"
@@ -7,17 +7,17 @@ import (
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/app/userapp"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/entities/user"
 	pb "gitlab.ozon.dev/Hostile359/homework-1/pkg/api"
-	// "google.golang.org/grpc"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 type implementation struct {
-	pb.UnimplementedAdminServer
+	pb.UnimplementedUserServer
 	userApp userapp.App
 }
 
-func New(userApp userapp.App) pb.AdminServer {
+func New(userApp userapp.App) pb.UserServer {
 	return &implementation{
 		userApp: userApp,
 	}
@@ -26,9 +26,7 @@ func New(userApp userapp.App) pb.AdminServer {
 func (i *implementation) UserAdd(ctx context.Context, in *pb.UserAddRequest) (*pb.UserAddResponse, error) {
 	u := user.NewUser(0, in.GetName(), in.GetPassword())
 	if err := i.userApp.Add(ctx, u); err != nil {
-		if errors.Is(err, userapp.ErrValidationArgs) {
-			return nil, status.Error(codes.InvalidArgument, err.Error())
-		} else if errors.Is(err, userapp.ErrUserExists) {
+		if errors.Is(err, userapp.ErrUserExists) {
 			return nil, status.Error(codes.AlreadyExists, err.Error())
 		}
 		return nil, status.Error(codes.Internal, err.Error())
@@ -79,9 +77,7 @@ func (i *implementation) UserList(ctx context.Context, in *pb.UserListRequest) (
 func (i *implementation) UserUpdate(ctx context.Context, in *pb.UserUpdateRequest) (*pb.UserUpdateResponse, error) {
 	u := user.NewUser(user.UserId(in.GetId()), in.GetName(), in.GetPassword())
 	if err := i.userApp.Update(ctx, u); err != nil {
-		if errors.Is(err, userapp.ErrValidationArgs) {
-			return nil, status.Error(codes.InvalidArgument, err.Error())
-		} else if errors.Is(err, userapp.ErrUserNotExists) {
+		if errors.Is(err, userapp.ErrUserNotExists) {
 			return nil, status.Error(codes.NotFound, err.Error())
 		}
 		return nil, status.Error(codes.Internal, err.Error())
