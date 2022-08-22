@@ -1,11 +1,12 @@
+//go:generate mockgen -source ../../../app/userapp/userapp.go -destination=./mocks/pguserstore.go -package=mock_pguserstore
 package pguserstore
 
 import (
 	"context"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/driftprogramming/pgxpoolmock"
 	"github.com/georgysavva/scany/pgxscan"
-	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/pkg/errors"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/app/userapp"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/entities/user"
@@ -18,10 +19,10 @@ const (
 var _ userapp.Storage = &Storage{}
 
 type Storage struct {
-	pool *pgxpool.Pool
+	pool pgxpoolmock.PgxPool
 }
 
-func New(pool *pgxpool.Pool) userapp.Storage {
+func New(pool pgxpoolmock.PgxPool) userapp.Storage {
 	return &Storage{
 		pool: pool,
 	}
