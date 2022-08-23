@@ -3,3 +3,4 @@ apikey.go
 bin
 .postgresql/
 local.env
+.vscode
