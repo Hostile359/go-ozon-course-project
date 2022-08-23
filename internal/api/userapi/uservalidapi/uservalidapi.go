@@ -1,3 +1,4 @@
+//go:generate mockgen -source ../../../../pkg/api/user_grpc.pb.go -destination=./mocks/usergrpc.go -package=mock_usergrpc
 package uservalidapi
 
 import (
