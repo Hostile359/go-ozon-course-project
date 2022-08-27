@@ -43,3 +43,17 @@ Run valid service
 Run test client (out of date)
 
 ```make grpc_client```
+
+
+## Tests
+Run unit tests
+
+```make .test```
+
+Unit tests coverege
+
+```make cover```
+
+Run integration tests (you need to run db and valid services, before)
+
+```make .integration_test```

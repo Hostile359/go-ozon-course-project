@@ -53,3 +53,18 @@ MIGRATIONS_DIR:=./migrations
 .PHONY: migration
 migration:
 	bin/goose -dir=${MIGRATIONS_DIR} create $(NAME) sql 
+
+.PHONY: .test
+.test:
+	$(info Running tests...)
+	go test -v $$(go list ./... | grep -v -E '/homework-1/pkg/(api)')
+
+.PHONY: .integration_test
+.integration_test:
+	$(info Running tests...)
+	go test -v -tags integration ./tests/...
+
+.PHONY: cover
+cover:
+	go test -v $$(go list ./... | grep -v -E '/homework-1/pkg/(api)') -covermode=count -coverprofile=/tmp/c.out
+	go tool cover -html=/tmp/c.out
