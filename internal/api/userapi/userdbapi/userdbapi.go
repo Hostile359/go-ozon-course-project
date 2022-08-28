@@ -2,12 +2,15 @@ package userdbapi
 
 import (
 	"context"
+	"strconv"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/app/userapp"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/entities/user"
 	pb "gitlab.ozon.dev/Hostile359/homework-1/pkg/api"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -37,8 +40,13 @@ func (i *implementation) UserAdd(ctx context.Context, in *pb.UserAddRequest) (*p
 }
 
 func (i *implementation) UserGet(ctx context.Context, in *pb.UserGetRequest) (*pb.UserGetResponse, error) {
+	newCtx, span := otel.Tracer(userapp.TracerName).Start(ctx, "userDbApi/UserGet")
+	defer span.End()
+
+	span.SetAttributes(attribute.String("id", strconv.FormatUint(in.GetId(), 10)))
+
 	log.Infof("Get user with id=%v", in.GetId())
-	u, err := i.userApp.Get(ctx, user.UserId(in.GetId()))
+	u, err := i.userApp.Get(newCtx, user.UserId(in.GetId()))
 	if err != nil {
 		log.Error(err)
 		if errors.Is(err, userapp.ErrUserNotExists) {
@@ -58,8 +66,14 @@ func (i *implementation) UserGet(ctx context.Context, in *pb.UserGetRequest) (*p
 }
 
 func (i *implementation) UserList(ctx context.Context, in *pb.UserListRequest) (*pb.UserListResponse, error) {
+	newCtx, span := otel.Tracer(userapp.TracerName).Start(ctx, "userDbApi/UserList")
+	defer span.End()
+
+	span.SetAttributes(attribute.String("page", strconv.FormatUint(in.GetPage(), 10)))
+	span.SetAttributes(attribute.String("perPage", strconv.FormatUint(in.GetPerPage(), 10)))
+
 	log.Infof("Get UserList, page=%v, perPage=%v", in.GetPage(), in.GetPerPage())
-	usersList, err := i.userApp.List(ctx, in.Page, in.PerPage)
+	usersList, err := i.userApp.List(newCtx, in.Page, in.PerPage)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

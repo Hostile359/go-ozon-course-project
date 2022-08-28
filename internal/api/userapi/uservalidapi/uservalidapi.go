@@ -4,14 +4,17 @@ package uservalidapi
 import (
 	"context"
 	"encoding/json"
-	
-	log "github.com/sirupsen/logrus"
+	"strconv"
+
 	"github.com/Shopify/sarama"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/app/userapp"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/counter"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/entities/user"
 	pb "gitlab.ozon.dev/Hostile359/homework-1/pkg/api"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -76,11 +79,16 @@ func (i *implementation) UserAdd(ctx context.Context, in *pb.UserAddRequest) (*p
 }
 
 func (i *implementation) UserGet(ctx context.Context, in *pb.UserGetRequest) (*pb.UserGetResponse, error) {
+	newCtx, span := otel.Tracer(userapp.TracerName).Start(ctx, "userValidApi/UserGet")
+	defer span.End()
+
+	span.SetAttributes(attribute.String("id", strconv.FormatUint(in.GetId(), 10)))
+
 	req := pb.UserGetRequest{
 		Id: in.GetId(),
 	}
 	log.Infof("Get user with id=%v", in.GetId())
-	resp, err := i.client.UserGet(ctx, &req)
+	resp, err := i.client.UserGet(newCtx, &req)
 	if err != nil {
 		counter.IncFailReq()
 		if !errors.Is(err, userapp.ErrUserNotExists) {
@@ -96,12 +104,18 @@ func (i *implementation) UserGet(ctx context.Context, in *pb.UserGetRequest) (*p
 }
 
 func (i *implementation) UserList(ctx context.Context, in *pb.UserListRequest) (*pb.UserListResponse, error) {
+	newCtx, span := otel.Tracer(userapp.TracerName).Start(ctx, "userValidApi/UserList")
+	defer span.End()
+
+	span.SetAttributes(attribute.String("page", strconv.FormatUint(in.GetPage(), 10)))
+	span.SetAttributes(attribute.String("perPage", strconv.FormatUint(in.GetPerPage(), 10)))
+
 	req := pb.UserListRequest{
 		Page: in.GetPage(),
 		PerPage: in.GetPerPage(),
 	}
 	log.Infof("Get UserList, page=%v, perPage=%v", in.GetPage(), in.GetPerPage())
-	resp, err := i.client.UserList(ctx, &req)
+	resp, err := i.client.UserList(newCtx, &req)
 	if err != nil {
 		counter.IncFailReq()
 		counter.IncInternalErr()
