@@ -3,6 +3,7 @@ package userdbapi
 import (
 	"context"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/pkg/errors"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/app/userapp"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/entities/user"
@@ -24,26 +25,29 @@ func New(userApp userapp.App) pb.UserServer {
 }
 
 func (i *implementation) UserAdd(ctx context.Context, in *pb.UserAddRequest) (*pb.UserAddResponse, error) {
-	u := user.NewUser(0, in.GetName(), in.GetPassword())
-	if err := i.userApp.Add(ctx, u); err != nil {
-		if errors.Is(err, userapp.ErrUserExists) {
-			return nil, status.Error(codes.AlreadyExists, err.Error())
-		}
-		return nil, status.Error(codes.Internal, err.Error())
-	}
+	// u := user.NewUser(0, in.GetName(), in.GetPassword())
+	// if err := i.userApp.Add(ctx, u); err != nil {
+	// 	if errors.Is(err, userapp.ErrUserExists) {
+	// 		return nil, status.Error(codes.AlreadyExists, err.Error())
+	// 	}
+	// 	return nil, status.Error(codes.Internal, err.Error())
+	// }
 
 	return &pb.UserAddResponse{}, nil
 }
 
 func (i *implementation) UserGet(ctx context.Context, in *pb.UserGetRequest) (*pb.UserGetResponse, error) {
+	log.Infof("Get user with id=%v", in.GetId())
 	u, err := i.userApp.Get(ctx, user.UserId(in.GetId()))
 	if err != nil {
+		log.Error(err)
 		if errors.Is(err, userapp.ErrUserNotExists) {
 			return nil, status.Error(codes.NotFound, err.Error())
 		}
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	
+	log.Infof("User: %v", u)
+
 	return &pb.UserGetResponse{
 		User: &pb.UserGetResponse_User{
 			Id: uint64(u.GetId()),
@@ -54,6 +58,7 @@ func (i *implementation) UserGet(ctx context.Context, in *pb.UserGetRequest) (*p
 }
 
 func (i *implementation) UserList(ctx context.Context, in *pb.UserListRequest) (*pb.UserListResponse, error) {
+	log.Infof("Get UserList, page=%v, perPage=%v", in.GetPage(), in.GetPerPage())
 	usersList, err := i.userApp.List(ctx, in.Page, in.PerPage)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -68,6 +73,7 @@ func (i *implementation) UserList(ctx context.Context, in *pb.UserListRequest) (
 			Password: u.GetPassword(),
 		})
 	}
+	log.Infof("UserList: %v", res)
 
 	return &pb.UserListResponse{
 		Users: res,
@@ -75,24 +81,24 @@ func (i *implementation) UserList(ctx context.Context, in *pb.UserListRequest) (
 }
 
 func (i *implementation) UserUpdate(ctx context.Context, in *pb.UserUpdateRequest) (*pb.UserUpdateResponse, error) {
-	u := user.NewUser(user.UserId(in.GetId()), in.GetName(), in.GetPassword())
-	if err := i.userApp.Update(ctx, u); err != nil {
-		if errors.Is(err, userapp.ErrUserNotExists) {
-			return nil, status.Error(codes.NotFound, err.Error())
-		}
-		return nil, status.Error(codes.Internal, err.Error())
-	}
+	// u := user.NewUser(user.UserId(in.GetId()), in.GetName(), in.GetPassword())
+	// if err := i.userApp.Update(ctx, u); err != nil {
+	// 	if errors.Is(err, userapp.ErrUserNotExists) {
+	// 		return nil, status.Error(codes.NotFound, err.Error())
+	// 	}
+	// 	return nil, status.Error(codes.Internal, err.Error())
+	// }
 
 	return &pb.UserUpdateResponse{}, nil
 }
 
 func (i *implementation) UserDelete(ctx context.Context, in *pb.UserDeleteRequest) (*pb.UserDeleteResponse, error) {
-	if err := i.userApp.Delete(ctx, user.UserId(in.GetId())); err != nil {
-		if errors.Is(err, userapp.ErrUserNotExists) {
-			return nil, status.Error(codes.NotFound, err.Error())
-		}
-		return nil, status.Error(codes.Internal, err.Error())
-	}
+	// if err := i.userApp.Delete(ctx, user.UserId(in.GetId())); err != nil {
+	// 	if errors.Is(err, userapp.ErrUserNotExists) {
+	// 		return nil, status.Error(codes.NotFound, err.Error())
+	// 	}
+	// 	return nil, status.Error(codes.Internal, err.Error())
+	// }
 
 	return &pb.UserDeleteResponse{}, nil
 }

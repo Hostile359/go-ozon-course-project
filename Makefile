@@ -45,8 +45,14 @@ up-db:
 	docker-compose build
 	docker-compose up -d postgres
 
-.PHONY: down-db
-down-db:
+.PHONY: up-kafka
+up-kafka:
+	docker-compose up -d zookeeper
+	docker-compose up -d kafka-1
+	docker-compose up -d kafka-ui
+
+.PHONY: down-docker
+down-docker:
 	docker-compose down
 
 MIGRATIONS_DIR:=./migrations

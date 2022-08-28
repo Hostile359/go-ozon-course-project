@@ -12,6 +12,7 @@ type Config struct {
 	ValidGrpcPort   string        `envconfig:"VALID_GRPC_PORT" default:":8081"`
 	ValidHttpPort   string        `envconfig:"VALID_HTTP_PORT" default:":8080"`
 	DBGrpcPort      string        `envconfig:"DB_GRPC_PORT" default:":8082"`
+	Brokers         string        `envconfig:"BROKERS" default:"localhost:9095"`
 }
 
 func NewConfig() (*Config, error) {

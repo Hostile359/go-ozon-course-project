@@ -2,12 +2,16 @@ package main
 
 import (
 	"context"
-	"log"
 	"net"
 	"net/http"
+	_ "net/http/pprof"
+	"strings"
 
+	log "github.com/sirupsen/logrus"
+	"github.com/Shopify/sarama"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/api/commentapi/commentvalidapi"
+	_ "gitlab.ozon.dev/Hostile359/homework-1/internal/counter"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/api/userapi/uservalidapi"
 	pb "gitlab.ozon.dev/Hostile359/homework-1/pkg/api"
 	"google.golang.org/grpc"
@@ -25,16 +29,15 @@ func runGRPCServer(cfg *Config) {
 	}
 	defer conns.Close()
 
-	userClient := pb.NewUserClient(conns)
-	commentClient := pb.NewCommentClient(conns)
-
 	listener, err := net.Listen("tcp", cfg.ValidGrpcPort)
 	if err != nil {
 		log.Fatalln(err)
 	}
 	grpcServer := grpc.NewServer()
-	pb.RegisterUserServer(grpcServer, uservalidapi.New(userClient))
-	pb.RegisterCommentServer(grpcServer, commentvalidapi.New(commentClient))
+	err = registerServices(cfg ,conns, grpcServer)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	if err = grpcServer.Serve(listener); err != nil {
 		log.Fatalln(err)
@@ -56,14 +59,29 @@ func runREST(cfg Config) {
 		log.Fatalln(err)
 	}
 
-	http_mux := http.NewServeMux()
-	http_mux.Handle("/", mux)
+	http.Handle("/", mux)
 
 	fs := http.FileServer(http.Dir(SwaggerDir))
-	http_mux.Handle("/swagger/", http.StripPrefix("/swagger/", fs))
+	http.Handle("/swagger/", http.StripPrefix("/swagger/", fs))
 
-	if err := http.ListenAndServe(cfg.ValidHttpPort, http_mux); err != nil {
+	if err := http.ListenAndServe(cfg.ValidHttpPort, nil); err != nil {
 		log.Fatalln(err)
 	}
 }
 
+func registerServices(cfg *Config, conns *grpc.ClientConn, grpcServer *grpc.Server) error {
+	brokers := strings.Split(cfg.Brokers, ",")
+	saramaCfg := sarama.NewConfig()
+	saramaCfg.Producer.Return.Successes = true
+	userClient := pb.NewUserClient(conns)
+	syncProducer, err := sarama.NewSyncProducer(brokers, saramaCfg)
+	if err != nil {
+		return err
+	}
+	pb.RegisterUserServer(grpcServer, uservalidapi.New(userClient, syncProducer))
+
+	commentClient := pb.NewCommentClient(conns)
+	pb.RegisterCommentServer(grpcServer, commentvalidapi.New(commentClient))
+
+	return nil
+}

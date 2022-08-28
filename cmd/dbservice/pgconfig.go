@@ -19,6 +19,7 @@ type Config struct {
 	MaxConnLifetime time.Duration `envconfig:"MAX_CONN_LIFE_TIME" default:"1h" required:"true"`
 	MinConns        int32         `envconfig:"MIN_CONNS" default:"2" required:"true"`
 	MaxConns        int32         `envconfig:"MAX_CONNS" default:"4" required:"true"`
+	Brokers         string        `envconfig:"BROKERS" default:"localhost:9095"`
 }
 
 func NewConfig() (*Config, error) {

@@ -18,7 +18,7 @@ type userValidApiFixture struct {
 func setUp(t *testing.T) userValidApiFixture {
 	var fixture userValidApiFixture
 	fixture.client = mock_usergrpc.NewMockUserClient(gomock.NewController(t))
-	fixture.userValidApi = New(fixture.client)
+	// fixture.userValidApi = New(fixture.client)
 
 	return fixture
 }
