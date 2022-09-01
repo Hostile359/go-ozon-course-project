@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/app/userapp"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/entities/user"
+	"go.opentelemetry.io/otel"
 )
 
 func TestAddUser(t *testing.T) {
@@ -78,12 +79,16 @@ func TestGetUser(t *testing.T) {
 		f := setUp(t)
 		defer f.tearDown()
 
+		newCtx, span := otel.Tracer(userapp.TracerName).Start(context.Background(), "pgUserStore/UserGet")
+		defer span.End()
+
+
 		u := user.NewUser(1, "user1", "123456")
 		queryStore := "SELECT id, name, password FROM users WHERE id = $1"
 		args := []interface{}{u.GetId()}
 		columns := []string{"id", "name", "password"}
 		pgxRows := pgxpoolmock.NewRows(columns).AddRow(u.GetId(), u.GetName(), u.GetPassword()).ToPgxRows()
-		f.mockPool.EXPECT().Query(context.Background(), queryStore, args...).Return(pgxRows, nil)
+		f.mockPool.EXPECT().Query(newCtx, queryStore, args...).Return(pgxRows, nil)
 		// act
 		actualUser, err := f.userStorage.Get(context.Background(), u.GetId())
 
@@ -97,12 +102,16 @@ func TestGetUser(t *testing.T) {
 		f := setUp(t)
 		defer f.tearDown()
 
+		newCtx, span := otel.Tracer(userapp.TracerName).Start(context.Background(), "pgUserStore/UserGet")
+		defer span.End()
+
+
 		u := user.NewUser(2, "user1", "123456")
 		queryStore := "SELECT id, name, password FROM users WHERE id = $1"
 		args := []interface{}{u.GetId()}
 		columns := []string{"id", "name", "password"}
 		pgxRows := pgxpoolmock.NewRows(columns).ToPgxRows()
-		f.mockPool.EXPECT().Query(context.Background(), queryStore, args...).Return(pgxRows, nil)
+		f.mockPool.EXPECT().Query(newCtx, queryStore, args...).Return(pgxRows, nil)
 		// act
 		actualUser, err := f.userStorage.Get(context.Background(), u.GetId())
 
@@ -117,6 +126,9 @@ func TestListUser(t *testing.T) {
 		// arrange
 		f := setUp(t)
 		defer f.tearDown()
+
+		newCtx, span := otel.Tracer(userapp.TracerName).Start(context.Background(), "pgUserStore/UserGet")
+		defer span.End()
 
 		var users []user.User
 		users = append(users, user.NewUser(1, "user1", "123456"))
@@ -133,7 +145,7 @@ func TestListUser(t *testing.T) {
 			rows.AddRow(u.GetId(), u.GetName(), u.GetPassword())
 		}
 		pgxRows := rows.ToPgxRows()
-		f.mockPool.EXPECT().Query(context.Background(), queryStore, args...).Return(pgxRows, nil)
+		f.mockPool.EXPECT().Query(newCtx, queryStore, args...).Return(pgxRows, nil)
 		
 		// act
 		actualUsers, err := f.userStorage.List(context.Background(), offset, limit)

@@ -22,7 +22,7 @@ func TestAddUser(t *testing.T) {
 			Password: "123456",
 		}
 		expectedResp := &pb.UserAddResponse{}
-		f.client.EXPECT().UserAdd(gomock.Any(), &req).Return(expectedResp, nil)
+		f.producer.ExpectSendMessageAndSucceed()
 
 		// act
 		resp, err := f.userValidApi.UserAdd(context.Background(), &req)
@@ -41,7 +41,6 @@ func TestAddUser(t *testing.T) {
 				Name: "",
 				Password: "123456",
 			}
-			f.client.EXPECT().UserAdd(gomock.Any(), &req).Times(0)
 	
 			// act
 			resp, err := f.userValidApi.UserAdd(context.Background(), &req)
@@ -60,7 +59,6 @@ func TestAddUser(t *testing.T) {
 				Name: "user1234567",
 				Password: "123456",
 			}
-			f.client.EXPECT().UserAdd(gomock.Any(), &req).Times(0)
 	
 			// act
 			resp, err := f.userValidApi.UserAdd(context.Background(), &req)
@@ -79,7 +77,6 @@ func TestAddUser(t *testing.T) {
 				Name: "user1",
 				Password: "12345",
 			}
-			f.client.EXPECT().UserAdd(gomock.Any(), &req).Times(0)
 	
 			// act
 			resp, err := f.userValidApi.UserAdd(context.Background(), &req)
@@ -98,7 +95,6 @@ func TestAddUser(t *testing.T) {
 				Name: "user1",
 				Password: "1234567890a",
 			}
-			f.client.EXPECT().UserAdd(gomock.Any(), &req).Times(0)
 	
 			// act
 			resp, err := f.userValidApi.UserAdd(context.Background(), &req)
@@ -175,7 +171,7 @@ func TestUpdateUser(t *testing.T) {
 			Password: "qwerty123",
 		}
 		expectedResp := &pb.UserUpdateResponse{}
-		f.client.EXPECT().UserUpdate(gomock.Any(), &req).Return(expectedResp, nil)
+		f.producer.ExpectSendMessageAndSucceed()
 
 		// act
 		resp, err := f.userValidApi.UserUpdate(context.Background(), &req)
@@ -195,7 +191,6 @@ func TestUpdateUser(t *testing.T) {
 				Name: "",
 				Password: "qwerty123",
 			}
-			f.client.EXPECT().UserUpdate(gomock.Any(), &req).Times(0)
 	
 			// act
 			resp, err := f.userValidApi.UserUpdate(context.Background(), &req)
@@ -215,7 +210,6 @@ func TestUpdateUser(t *testing.T) {
 				Name: "user1234567",
 				Password: "qwerty123",
 			}
-			f.client.EXPECT().UserUpdate(gomock.Any(), &req).Times(0)
 	
 			// act
 			resp, err := f.userValidApi.UserUpdate(context.Background(), &req)
@@ -235,7 +229,6 @@ func TestUpdateUser(t *testing.T) {
 				Name: "user1",
 				Password: "qwert",
 			}
-			f.client.EXPECT().UserUpdate(gomock.Any(), &req).Times(0)
 	
 			// act
 			resp, err := f.userValidApi.UserUpdate(context.Background(), &req)
@@ -255,7 +248,6 @@ func TestUpdateUser(t *testing.T) {
 				Name: "user1",
 				Password: "qwerty12345",
 			}
-			f.client.EXPECT().UserUpdate(gomock.Any(), &req).Times(0)
 	
 			// act
 			resp, err := f.userValidApi.UserUpdate(context.Background(), &req)
@@ -277,7 +269,7 @@ func TestDeleteUser(t *testing.T) {
 			Id: 1,
 		}
 		expectedResp:= &pb.UserDeleteResponse{}
-		f.client.EXPECT().UserDelete(gomock.Any(), &req).Return(expectedResp, nil)
+		f.producer.ExpectSendMessageAndSucceed()
 
 		// act
 		resp, err := f.userValidApi.UserDelete(context.Background(), &req)
