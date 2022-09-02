@@ -115,8 +115,8 @@ func TestGetUser(t *testing.T) {
 		for i := 0; i < 5; i++ {
 			time.Sleep(time.Second)
 			resp, err = UserClient.UserGet(context.Background(), &req)
-			if err != nil {
-				continue
+			if err == nil {
+				break
 			}
 		}
 
@@ -155,8 +155,8 @@ func TestListUser(t *testing.T) {
 		for i := 0; i < 5; i++ {
 			time.Sleep(time.Second)
 			resp, err = UserClient.UserList(context.Background(), &req)
-			if err != nil {
-				continue
+			if err == nil {
+				break
 			}
 		}
 
