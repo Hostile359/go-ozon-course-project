@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/app/commentapp"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/app/userapp"
@@ -46,5 +46,6 @@ func main() {
 	userApp := userapp.New(userStorage)
 	commentApp := commentapp.New(commentStorage, *userApp)
 	// go runREST()
+	go runConsumer(*cfg, userApp)
 	runGRPCServer(cfg, userApp, commentApp)
 }

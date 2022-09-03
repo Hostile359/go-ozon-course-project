@@ -4,3 +4,4 @@ bin
 .postgresql/
 local.env
 .vscode
+kafka_data

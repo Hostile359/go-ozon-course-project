@@ -18,8 +18,10 @@ To prepare project enviroment you need to set up your tg apikey:
 
 ```make prepare APIKEY="<your_tg_apikey>"```
 
-## Prepare DB
-Build and start docker compose
+## Prepare Services
+### DB
+
+Build and start docker compose with db
 
 ```make up-db```
 
@@ -27,9 +29,19 @@ Make migrations
 
 ```./migrate.sh```
 
-Stop docker compose
+### Kafka
 
-```make down-db```
+Build and start docker compose with kafka
+
+```make up-kafka```
+
+Create topics
+
+```./create_topics.sh```
+
+### Stop docker compose
+
+```make down-docker```
 
 ## Run
 Run db service

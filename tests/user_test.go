@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package tests
@@ -5,6 +6,7 @@ package tests
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -108,7 +110,15 @@ func TestGetUser(t *testing.T) {
 		}
 
 		// act
-		resp, err := UserClient.UserGet(context.Background(), &req)
+		var resp *pb.UserGetResponse
+		var err error
+		for i := 0; i < 5; i++ {
+			time.Sleep(time.Second)
+			resp, err = UserClient.UserGet(context.Background(), &req)
+			if err == nil {
+				break
+			}
+		}
 
 		// assert
 		require.NoError(t, err)
@@ -140,7 +150,15 @@ func TestListUser(t *testing.T) {
 		req := pb.UserListRequest{}
 
 		// act
-		resp, err := UserClient.UserList(context.Background(), &req)
+		var resp *pb.UserListResponse
+		var err error
+		for i := 0; i < 5; i++ {
+			time.Sleep(time.Second)
+			resp, err = UserClient.UserList(context.Background(), &req)
+			if err == nil {
+				break
+			}
+		}
 
 		// assert
 		require.NoError(t, err)
@@ -234,24 +252,6 @@ func TestUpdateUser(t *testing.T) {
 			assert.Equal(t, codes.InvalidArgument, status.Code(err))
 			assert.Nil(t, resp)
 		})
-
-		t.Run("wrong user id", func(t *testing.T) {
-			// arrange
-	
-			req := pb.UserUpdateRequest{
-				Id: 2,
-				Name: "user1",
-				Password: "12345678",
-			}
-	
-			// act
-			resp, err := UserClient.UserUpdate(context.Background(), &req)
-	
-			// assert
-			require.Error(t, err)
-			assert.Equal(t, codes.NotFound, status.Code(err))
-			assert.Nil(t, resp)
-		})
 	})
 }
 
@@ -267,20 +267,5 @@ func TestDeleteUser(t *testing.T) {
 
 		// assert
 		require.NoError(t, err)
-	})
-
-	t.Run("error", func(t *testing.T) {
-		// arrange
-		req := pb.UserDeleteRequest{
-			Id: 2,
-		}
-
-		// act
-		resp, err := UserClient.UserDelete(context.Background(), &req)
-
-		// assert
-		require.Error(t, err)
-		assert.Equal(t, codes.NotFound, status.Code(err))
-		assert.Nil(t, resp)
 	})
 }

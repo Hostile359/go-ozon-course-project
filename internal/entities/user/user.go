@@ -7,9 +7,9 @@ import (
 type UserId uint
 
 type User struct {
-	Id       UserId `db:"id"`
-	Name     string `db:"name"`
-	Password string	`db:"password"`
+	Id       UserId `db:"id"        json:"id"`
+	Name     string `db:"name"      json:"name"`
+	Password string	`db:"password"  json:"password"`
 }
 
 func NewUser(id UserId, name, password string) User {

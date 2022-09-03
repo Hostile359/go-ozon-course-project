@@ -3,6 +3,7 @@ package pguserstore
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/driftprogramming/pgxpoolmock"
@@ -10,6 +11,8 @@ import (
 	"github.com/pkg/errors"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/app/userapp"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/entities/user"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 const (
@@ -65,6 +68,11 @@ func (s *Storage) Update(ctx context.Context, u user.User) error {
 }
 
 func (s *Storage) Get(ctx context.Context, id user.UserId) (*user.User, error) {
+	newCtx, span := otel.Tracer(userapp.TracerName).Start(ctx, "pgUserStore/UserGet")
+	defer span.End()
+
+	span.SetAttributes(attribute.String("id", strconv.FormatUint(uint64(id), 10)))
+
 	query, args, err := squirrel.Select("id, name, password").
 		From("users").
 		Where(squirrel.Eq{
@@ -75,7 +83,7 @@ func (s *Storage) Get(ctx context.Context, id user.UserId) (*user.User, error) {
 		return nil, errors.Errorf("Storage.Get: to sql: %v", err)
 	}
 	var users []user.User
-	if err := pgxscan.Select(ctx, s.pool, &users, query, args...); err != nil {
+	if err := pgxscan.Select(newCtx, s.pool, &users, query, args...); err != nil {
 		return nil, errors.Errorf("Storage.Get: select: %v", err)
 	}
 	
@@ -86,6 +94,12 @@ func (s *Storage) Get(ctx context.Context, id user.UserId) (*user.User, error) {
 }
 
 func (s *Storage) List(ctx context.Context, offset, limit uint64) ([]user.User, error) {
+	newCtx, span := otel.Tracer(userapp.TracerName).Start(ctx, "pgUserStore/UserList")
+	defer span.End()
+
+	span.SetAttributes(attribute.String("offset", strconv.FormatUint(offset, 10)))
+	span.SetAttributes(attribute.String("limit", strconv.FormatUint(limit, 10)))
+
 	query, args, err := squirrel.Select("id, name, password").
 		From("users").
 		Offset(offset).
@@ -97,7 +111,7 @@ func (s *Storage) List(ctx context.Context, offset, limit uint64) ([]user.User, 
 		return nil, errors.Errorf("Storage.List: to sql: %v", err)
 	}
 	var users []user.User
-	if err := pgxscan.Select(ctx, s.pool, &users, query, args...); err != nil {
+	if err := pgxscan.Select(newCtx, s.pool, &users, query, args...); err != nil {
 		return nil, errors.Errorf("Storage.List: select: %v", err)
 	}
 

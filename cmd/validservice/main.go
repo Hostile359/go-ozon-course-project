@@ -1,8 +1,7 @@
 package main
 
 import (
-	"log"
-
+	log "github.com/sirupsen/logrus"
 	// "gitlab.ozon.dev/Hostile359/homework-1/internal/app/commentapp"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/app/userapp"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/commander"

@@ -2,10 +2,13 @@ package userapp
 
 import (
 	"context"
+	"strconv"
 	"time"
 
 	"github.com/pkg/errors"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/entities/user"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 const (
@@ -13,6 +16,8 @@ const (
 	pageDefault = 1
 	perPageDefault = 5
 )
+
+const TracerName = "userapp"
 
 var (
 	ErrValidationArgs = errors.New("Bad argument")
@@ -53,14 +58,25 @@ func (a *App) Update(ctx context.Context, u user.User) error {
 }
 
 func (a App) Get(ctx context.Context, id user.UserId)  (*user.User, error) {
-	ctx, cancel := context.WithTimeout(ctx, storageTimeout)
+	newCtx, span := otel.Tracer(TracerName).Start(ctx, "userApp/UserGet")
+	defer span.End()
+
+	span.SetAttributes(attribute.String("id", strconv.FormatUint(uint64(id), 10)))
+	
+	ctx, cancel := context.WithTimeout(newCtx, storageTimeout)
 	defer cancel()
 
 	return a.userStorage.Get(ctx, id)
 }
 
 func (a App) List(ctx context.Context, page, perPage uint64) ([]user.User, error) {
-	ctx, cancel := context.WithTimeout(ctx, storageTimeout)
+	newCtx, span := otel.Tracer(TracerName).Start(ctx, "userApp/UserList")
+	defer span.End()
+
+	span.SetAttributes(attribute.String("page", strconv.FormatUint(page, 10)))
+	span.SetAttributes(attribute.String("perPage", strconv.FormatUint(perPage, 10)))
+
+	ctx, cancel := context.WithTimeout(newCtx, storageTimeout)
 	defer cancel()
 
 	if page == 0 {
