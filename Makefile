@@ -51,6 +51,10 @@ up-kafka:
 	docker-compose up -d kafka-1
 	docker-compose up -d kafka-ui
 
+.PHONY: up-redis
+up-redis:
+	docker-compose up -d redis
+
 .PHONY: down-docker
 down-docker:
 	docker-compose down

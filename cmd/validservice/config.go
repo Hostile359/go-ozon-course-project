@@ -13,6 +13,7 @@ type Config struct {
 	ValidHttpPort   string        `envconfig:"VALID_HTTP_PORT" default:":8080"`
 	DBGrpcPort      string        `envconfig:"DB_GRPC_PORT" default:":8082"`
 	Brokers         string        `envconfig:"BROKERS" default:"localhost:9095"`
+	RedisHost       string        `envconfig:"REDIS_HOST" default:"localhost:6379"`
 }
 
 func NewConfig() (*Config, error) {

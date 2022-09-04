@@ -27,7 +27,7 @@ func setUp(t *testing.T) userValidApiFixture {
 	saramaCfg := sarama.NewConfig()
 	saramaCfg.Producer.Return.Successes = true
 	fixture.producer = mock_sarama.NewSyncProducer(t, saramaCfg)
-	fixture.userValidApi = New(fixture.client, fixture.producer)
+	// fixture.userValidApi = New(fixture.client, fixture.producer)
 
 	return fixture
 }
