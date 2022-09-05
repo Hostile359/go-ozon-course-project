@@ -262,6 +262,16 @@ func (i *implementation) UserDelete(ctx context.Context, in *pb.UserDeleteReques
 
 	log.Infof("Sended msg to delete_users topic, partition: %v, offset: %v", par, off)
 
+	log.Infof("Deleting user with id [%v] from redis", in.GetId())
+	res := i.redisClient.Del(strconv.FormatUint(in.GetId(), 10))
+	if res.Err() == redis.Nil {
+		log.Infof("User with id [%v] doesn't exist in redis", in.GetId())
+	} else if res.Err() != nil {
+		log.Error(err)
+	} else {
+		log.Info("Done")
+	}
+	
 	counter.IncSuccessReq()
 	return &pb.UserDeleteResponse{}, nil
 }
