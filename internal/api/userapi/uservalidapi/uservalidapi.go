@@ -234,6 +234,8 @@ func (i *implementation) UserUpdate(ctx context.Context, in *pb.UserUpdateReques
 
 	log.Infof("Sended msg to update_users topic, partition: %v, offset: %v", par, off)
 
+	i.deleteUserFromRedis(in.GetId())
+
 	counter.IncSuccessReq()
 	return &pb.UserUpdateResponse{}, nil
 }
@@ -262,18 +264,22 @@ func (i *implementation) UserDelete(ctx context.Context, in *pb.UserDeleteReques
 
 	log.Infof("Sended msg to delete_users topic, partition: %v, offset: %v", par, off)
 
-	log.Infof("Deleting user with id [%v] from redis", in.GetId())
-	res := i.redisClient.Del(strconv.FormatUint(in.GetId(), 10))
-	if res.Err() == redis.Nil {
-		log.Infof("User with id [%v] doesn't exist in redis", in.GetId())
-	} else if res.Err() != nil {
-		log.Error(err)
-	} else {
-		log.Info("Done")
-	}
+	i.deleteUserFromRedis(in.GetId())
 	
 	counter.IncSuccessReq()
 	return &pb.UserDeleteResponse{}, nil
+}
+
+func (i *implementation) deleteUserFromRedis(id uint64) {
+	log.Infof("Deleting user with id [%v] from redis", id)
+	res := i.redisClient.Del(strconv.FormatUint(id, 10))
+	if res.Err() == redis.Nil {
+		log.Infof("User with id [%v] doesn't exist in redis", id)
+	} else if res.Err() != nil {
+		log.Error(res.Err())
+	} else {
+		log.Info("Done")
+	}
 }
 
 func checkName(name string) error {
