@@ -7,12 +7,13 @@ import (
 	_ "net/http/pprof"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/Shopify/sarama"
+	"github.com/go-redis/redis"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	log "github.com/sirupsen/logrus"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/api/commentapi/commentvalidapi"
-	_ "gitlab.ozon.dev/Hostile359/homework-1/internal/counter"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/api/userapi/uservalidapi"
+	_ "gitlab.ozon.dev/Hostile359/homework-1/internal/counter"
 	pb "gitlab.ozon.dev/Hostile359/homework-1/pkg/api"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -78,7 +79,12 @@ func registerServices(cfg *Config, conns *grpc.ClientConn, grpcServer *grpc.Serv
 	if err != nil {
 		return err
 	}
-	pb.RegisterUserServer(grpcServer, uservalidapi.New(userClient, syncProducer))
+	redisClient := redis.NewClient(&redis.Options{
+		Addr: cfg.RedisHost,
+		DB: 0,
+		Password: "",
+	})
+	pb.RegisterUserServer(grpcServer, uservalidapi.New(userClient, syncProducer, redisClient))
 
 	commentClient := pb.NewCommentClient(conns)
 	pb.RegisterCommentServer(grpcServer, commentvalidapi.New(commentClient))

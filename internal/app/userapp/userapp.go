@@ -14,10 +14,11 @@ import (
 const (
 	storageTimeout = 10*time.Second
 	pageDefault = 1
-	perPageDefault = 5
+	PerPageDefault = 5
 )
 
 const TracerName = "userapp"
+const PubSubChKey = "userappPubSubCh"
 
 var (
 	ErrValidationArgs = errors.New("Bad argument")
@@ -83,7 +84,7 @@ func (a App) List(ctx context.Context, page, perPage uint64) ([]user.User, error
 		page = pageDefault
 	}
 	if perPage == 0 {
-		perPage = perPageDefault
+		perPage = PerPageDefault
 	}
 
 	offset := (page - 1) * perPage

@@ -1,7 +1,10 @@
 package user
 
 import (
+	"encoding/json"
 	"fmt"
+
+	"github.com/pkg/errors"
 )
 
 type UserId uint
@@ -44,4 +47,20 @@ func (u User) GetPassword() string {
 
 func (u User) GetId() UserId {
 	return u.Id
+}
+
+func (u User) MarshalBinary() ([]byte, error) {
+	res, err := json.Marshal(u)
+	if err != nil {
+		return nil, errors.Wrapf(err, "while marshal user: %v", u)
+	}
+	return res, nil
+}
+
+func (u *User) UnmarshalBinary(data []byte) error {
+	err := json.Unmarshal(data, u)
+	if err != nil {
+		return errors.Wrapf(err, "while unmarshal user: %v", u)
+	}
+	return nil
 }

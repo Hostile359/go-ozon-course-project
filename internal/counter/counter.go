@@ -11,6 +11,8 @@ var (
 	failReqCounter *counter
 	validErrCounter *counter
 	internalErrCounter *counter
+	cacheHitCounter *counter
+	cacheMissCounter *counter
 )
 
 type counter struct {
@@ -46,6 +48,14 @@ func IncInternalErr() {
 	internalErrCounter.Inc()
 }
 
+func IncCacheHit() {
+	cacheHitCounter.Inc()
+}
+
+func IncCacheMiss() {
+	cacheMissCounter.Inc()
+}
+
 func init() {
 	successReqCounter = &counter{m: &sync.RWMutex{}}
 	expvar.Publish("SuccessRequests", successReqCounter)
@@ -58,4 +68,10 @@ func init() {
 
 	internalErrCounter = &counter{m: &sync.RWMutex{}}
 	expvar.Publish("InternalErrors", internalErrCounter)
+
+	cacheHitCounter = &counter{m: &sync.RWMutex{}}
+	expvar.Publish("CacheHits", cacheHitCounter)
+
+	cacheMissCounter = &counter{m: &sync.RWMutex{}}
+	expvar.Publish("CacheMisses", cacheMissCounter)
 }

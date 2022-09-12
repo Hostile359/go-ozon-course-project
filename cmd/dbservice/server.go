@@ -6,8 +6,9 @@ import (
 	"strings"
 	"time"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/Shopify/sarama"
+	"github.com/go-redis/redis"
+	log "github.com/sirupsen/logrus"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/api/commentapi/commentdbapi"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/api/userapi/userdbapi"
 	"gitlab.ozon.dev/Hostile359/homework-1/internal/app/commentapp"
@@ -24,7 +25,12 @@ func runGRPCServer(cfg *Config, userApp *userapp.App, commentApp *commentapp.App
 	}
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterUserServer(grpcServer, userdbapi.New(*userApp))
+	redisClient := redis.NewClient(&redis.Options{
+		Addr: cfg.RedisHost,
+		DB: 0,
+		Password: "",
+	})
+	pb.RegisterUserServer(grpcServer, userdbapi.New(*userApp, redisClient))
 	pb.RegisterCommentServer(grpcServer, commentdbapi.New(*commentApp))
 
 	if err = grpcServer.Serve(listener); err != nil {

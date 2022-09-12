@@ -53,6 +53,7 @@ require (
 	github.com/Masterminds/squirrel v1.5.3
 	github.com/Shopify/sarama v1.36.0
 	github.com/georgysavva/scany v1.1.0
+	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/golang/glog v1.0.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/jackc/pgx/v4 v4.17.0

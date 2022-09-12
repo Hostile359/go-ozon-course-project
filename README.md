@@ -39,6 +39,12 @@ Create topics
 
 ```./create_topics.sh```
 
+### Redis
+
+Build and start docker compose with redis
+
+```make up-redis```
+
 ### Stop docker compose
 
 ```make down-docker```

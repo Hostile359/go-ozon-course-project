@@ -20,6 +20,7 @@ type Config struct {
 	MinConns        int32         `envconfig:"MIN_CONNS" default:"2" required:"true"`
 	MaxConns        int32         `envconfig:"MAX_CONNS" default:"4" required:"true"`
 	Brokers         string        `envconfig:"BROKERS" default:"localhost:9095"`
+	RedisHost       string        `envconfig:"REDIS_HOST" default:"localhost:6379"`
 }
 
 func NewConfig() (*Config, error) {
